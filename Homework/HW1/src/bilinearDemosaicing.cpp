@@ -71,7 +71,6 @@ int main(int argc, char *argv[]){
     // Step2: Apply Demosaicing method to the extended image
     // GRBG Bayers' Pattern and channels: RGB
     unsigned char imageOut[ImageHeight][ImageWidth][3];
-
     /** 
     ** Green, Blue, Red pixels' red values estimation by using Red pixels
     **/
@@ -140,9 +139,8 @@ int main(int argc, char *argv[]){
     }
 
 
-
     // Todo: Store image
-    if(!(file=fopen(argv[2],"wb"))){
+    if(!(file = fopen(argv[2],"wb"))){
         cout << "Cannot open file: " << endl;
         exit(1);
     }
