@@ -1,1 +1,0 @@
-# EE569-ImageProcessing
