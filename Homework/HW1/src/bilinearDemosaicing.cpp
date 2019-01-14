@@ -37,7 +37,6 @@ int main(int argc, char *argv[]){
 
     // Todo: Read raw image into program and store it in array
     unsigned char imageData[ImageHeight][ImageWidth][BytesPerPixel];   // Image array to store .raw file
-    // Todo: Modify Address
     if(file = fopen(argv[1],"rb")){
         fread(imageData,sizeof(unsigned char), ImageHeight*ImageWidth*BytesPerPixel, file);
     }else{
@@ -47,7 +46,7 @@ int main(int argc, char *argv[]){
 
     
     // Todo: Bilinear Demosaicing
-    // Step1: Boundary reflection: Reflect two pixels near boundary
+    // Step1: Boundary reflection: Reflect one pixel near boundary
     unsigned char imageTemp[ImageHeight+2][ImageWidth][BytesPerPixel];
     unsigned char imageExtend[ImageHeight+2][ImageWidth+2][BytesPerPixel];
     for(int channel = 0; channel < BytesPerPixel; channel++){
