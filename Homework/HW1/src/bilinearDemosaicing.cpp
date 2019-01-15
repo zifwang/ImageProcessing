@@ -88,11 +88,7 @@ int main(int argc, char *argv[]){
     for(int i = 1; i < ImageHeight; i = i+2){
         for(int j = 0; j < ImageWidth; j = j+2){
             // Red value at blue pixels position
-<<<<<<< HEAD
-            imageOut[i][j][0] = (unsigned char) ((int(imageExtend[i][j][0]) + int(imageExtend[i][j+2][0]) + int(imageExtend[i+2][j][0]) + int(imageExtend[i+2][j+2][0]) )/4);
-=======
             imageOut[i][j][0] = (unsigned char)((int(imageExtend[i][j][0]) + int(imageExtend[i+2][j][0]) + int(imageExtend[i+2][j+2][0]) + int(imageExtend[i][j+2][0]))/4);
->>>>>>> ad6d147b27944e1bcab8d32e04f8ea753666172a
         }
         for(int k = 1; k < ImageWidth; k = k+2){
             // Red value at green pixels position which in the same line as blue pixels
