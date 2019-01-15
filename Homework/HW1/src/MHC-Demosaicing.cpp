@@ -88,6 +88,10 @@ int main(int argc, char *argv[]){
             // Green value where green pixels' coeff = 1/2.
             tempVal = tempVal + (int(imageExtend[i+2-2][j+2][0]) + int(imageExtend[i+2+2][j+2][0]))/16;
 
+            // Prevent value more than or less than grey scale range
+            if(tempVal < 0) tempVal = 0;
+            if(tempVal > 255) tempVal = 255;
+
             // Generate red value at location i,j which is green pixels
             imageOut[i][j][0] =  (unsigned char)tempVal;
         }
@@ -105,6 +109,10 @@ int main(int argc, char *argv[]){
             // Add correction term to red value
             tempVal = tempVal + 3*(int(imageExtend[i+2][j+2][0]) - (int(imageExtend[i+2][j+2-2][0]) + int(imageExtend[i+2+2][j+2][0]) + int(imageExtend[i+2][j+2+2][0]) + int(imageExtend[i+2-2][j+2][0]))/4)/4;
 
+            // Prevent value more than or less than grey scale range
+            if(tempVal < 0) tempVal = 0;
+            if(tempVal > 255) tempVal = 255;
+
             // Generate red value at location i,j which is blue pixels
             imageOut[i][j][0] =  (unsigned char)tempVal;
         }
@@ -118,6 +126,10 @@ int main(int argc, char *argv[]){
             tempVal = tempVal + int(imageExtend[i+2][k+2-2][0])/16 + int(imageExtend[i+2][k+2+2][0])/16;
             // Add six green each weighted by -1/8
             tempVal = tempVal - (int(imageExtend[i+2-1][k+2-1][0]) + int(imageExtend[i+2+1][k+2-1][0]) + int(imageExtend[i+2+2][k+2][0]) + int(imageExtend[i+2+1][k+2+1][0]) + int(imageExtend[i+2-1][k+2+1][0]) + int(imageExtend[i+2-2][k+2][0]))/8;
+
+            // Prevent value more than or less than grey scale range
+            if(tempVal < 0) tempVal = 0;
+            if(tempVal > 255) tempVal = 255;
 
             // Generate red value at location i,j which is green pixels
             imageOut[i][k][0] =  (unsigned char)tempVal;
@@ -138,7 +150,11 @@ int main(int argc, char *argv[]){
             int tempVal = (int(imageExtend[i+2][k+2-1][0]) + int(imageExtend[i+2+1][k+2][0]) + int(imageExtend[i+2][k+2+1][0]) + int(imageExtend[i+2-1][k+21][0]))/4;
             // Add Correction term.
             tempVal = tempVal + (int(imageExtend[i+2][k+2][0]) - (int(imageExtend[i+2][k+2-2][0]) + int(imageExtend[i+2+2][k+2][0]) + int(imageExtend[i+2][k+2+2][0]) + int(imageExtend[i+2-2][k+2][0]))/4)/2;
-            
+
+            // Prevent value more than or less than grey scale range
+            if(tempVal < 0) tempVal = 0;
+            if(tempVal > 255) tempVal = 255;
+
             // Generate red value at location i,j which is green pixels
             imageOut[i][k][1] =  (unsigned char)tempVal;
         }
@@ -150,6 +166,10 @@ int main(int argc, char *argv[]){
             int tempVal = (int(imageExtend[i+2][j+2-1][0]) + int(imageExtend[i+2+1][j+2][0]) + int(imageExtend[i+2][j+2+1][0]) + int(imageExtend[i+2-1][j+2][0]))/4;
             // Add Correction term.
             tempVal = tempVal + (int(imageExtend[i+2][j+2][0]) - (int(imageExtend[i+2][j+2-2][0]) + int(imageExtend[i+2+2][j+2][0]) + int(imageExtend[i+2][j+2+2][0]) + int(imageExtend[i+2-2][j+2][0]))/4)/2;
+
+            // Prevent value more than or less than grey scale range
+            if(tempVal < 0) tempVal = 0;
+            if(tempVal > 255) tempVal = 255;
 
             // Generate red value at location i,j which is green pixels
             imageOut[i][j][1] =  (unsigned char)tempVal;
@@ -170,15 +190,23 @@ int main(int argc, char *argv[]){
             int tempVal = (int(imageExtend[i+2-1][j+2][0]) + int(imageExtend[i+2+1][j+2][0]))/2;
             // Add Correction term
             tempVal = tempVal + int(imageExtend[i+2][j+2][0])*5/8 + int(imageExtend[i+2][j+2-2][0])/16 + int(imageExtend[i+2][j+2+2][0])/16;
-            tempVal = tempVal + (int(imageExtend[i+2-1][j+2-1][0]) + int(imageExtend[i+2+1][j+2-1][0]) + int(imageExtend[i+2+2][j+2][0]) + int(imageExtend[i+2+1][j+2+1][0]) + int(imageExtend[i+2-1][j+2+1][0]) + int(imageExtend[i+2-2][j+2][0]))/8;
-        
+            tempVal = tempVal - (int(imageExtend[i+2-1][j+2-1][0]) + int(imageExtend[i+2+1][j+2-1][0]) + int(imageExtend[i+2+2][j+2][0]) + int(imageExtend[i+2+1][j+2+1][0]) + int(imageExtend[i+2-1][j+2+1][0]) + int(imageExtend[i+2-2][j+2][0]))/8;
+
+            // Prevent value more than or less than grey scale range
+            if(tempVal < 0) tempVal = 0;
+            if(tempVal > 255) tempVal = 255;
+
             imageOut[i][j][2] = (unsigned char)tempVal;
         }
         for(int k = 1; k < ImageWidth; k = k+2){
             // Add four nearby blue
             int tempVal = (int(imageExtend[i+2-1][k+2-1][0]) + int(imageExtend[i+2+1][k+2-1][0]) + int(imageExtend[i+2+1][k+2+1][0]) + int(imageExtend[i+2-1][k+2+1][0]))/4;
             // Add correction term to red value
-            tempVal = tempVal + 3*(int(imageExtend[i+2][k+2][0]) - (int(imageExtend[i+2][k+2-2][0]) + int(imageExtend[i+2+2][k+2][0]) + int(imageExtend[i+2][k+2+2][0]) + int(imageExtend[i+2-2][k+2][0]))/4)/4;
+            tempVal = tempVal + 3/4*int(imageExtend[i+2][k+2][0]) - 3/4*((int(imageExtend[i+2][k+2-2][0]) + int(imageExtend[i+2+2][k+2][0]) + int(imageExtend[i+2][k+2+2][0]) + int(imageExtend[i+2-2][k+2][0]))/4);
+
+            // Prevent value more than or less than grey scale range
+            if(tempVal < 0) tempVal = 0;
+            if(tempVal > 255) tempVal = 255;
 
             // Generate red value at location i,j which is blue pixels
             imageOut[i][k][2] =  (unsigned char)tempVal;
@@ -196,6 +224,10 @@ int main(int argc, char *argv[]){
             // Add Correction term
             tempVal = tempVal + int(imageExtend[i+2][k+2][0])*5/8 + int(imageExtend[i+2-2][k+2][0])/16 + int(imageExtend[i+2+2][k+2][0])/16;
             tempVal = tempVal - (int(imageExtend[i+2][k+2-2][0]) + int(imageExtend[i+2+1][k+2-1][0]) + int(imageExtend[i+2+1][k+2+1][0]) + int(imageExtend[i+2][k+2+2][0]) + int(imageExtend[i+2-1][k+2+1][0]) + int(imageExtend[i+2-1][k+2-1][0]))/8;
+
+            // Prevent value more than or less than grey scale ranges
+            if(tempVal < 0) tempVal = 0;
+            if(tempVal > 255) tempVal = 255;
 
             imageOut[i][k][2] = (unsigned char)tempVal;
         }
