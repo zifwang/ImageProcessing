@@ -37,7 +37,6 @@ int main(int argc, char *argv[]){
 
     // Todo: Read raw image into program and store it in array
     unsigned char imageData[ImageHeight][ImageWidth][BytesPerPixel];   // Image array to store .raw file
-    // Todo: Modify Address
     if(file = fopen(argv[1],"rb")){
         fread(imageData,sizeof(unsigned char), ImageHeight*ImageWidth*BytesPerPixel, file);
     }else{
@@ -47,7 +46,7 @@ int main(int argc, char *argv[]){
 
     
     // Todo: Bilinear Demosaicing
-    // Step1: Boundary reflection: Reflect two pixels near boundary
+    // Step1: Boundary reflection: Reflect one pixel near boundary
     unsigned char imageTemp[ImageHeight+2][ImageWidth][BytesPerPixel];
     unsigned char imageExtend[ImageHeight+2][ImageWidth+2][BytesPerPixel];
     for(int channel = 0; channel < BytesPerPixel; channel++){
@@ -71,8 +70,7 @@ int main(int argc, char *argv[]){
     // Step2: Apply Demosaicing method to the extended image
     // GRBG Bayers' Pattern and channels: RGB
     unsigned char imageOut[ImageHeight][ImageWidth][3];
-
-    /** 
+    /** Red Layer
     ** Green, Blue, Red pixels' red values estimation by using Red pixels
     **/
     // Red pixels line
@@ -90,42 +88,49 @@ int main(int argc, char *argv[]){
     for(int i = 1; i < ImageHeight; i = i+2){
         for(int j = 0; j < ImageWidth; j = j+2){
             // Red value at blue pixels position
+<<<<<<< HEAD
             imageOut[i][j][0] = (unsigned char) ((int(imageExtend[i][j][0]) + int(imageExtend[i][j+2][0]) + int(imageExtend[i+2][j][0]) + int(imageExtend[i+2][j+2][0]) )/4);
+=======
+            imageOut[i][j][0] = (unsigned char)((int(imageExtend[i][j][0]) + int(imageExtend[i+2][j][0]) + int(imageExtend[i+2][j+2][0]) + int(imageExtend[i][j+2][0]))/4);
+>>>>>>> ad6d147b27944e1bcab8d32e04f8ea753666172a
         }
         for(int k = 1; k < ImageWidth; k = k+2){
+            // Red value at green pixels position which in the same line as blue pixels
             imageOut[i][k][0] = (unsigned char)((int(imageExtend[i][k+1][0]) + int(imageExtend[i+2][k+1][0]))/2);
         }
     }
 
-    /** 
+    /** Green Layer
     ** Green, Blue, Red pixels' green values estimation by using Green pixels
     **/
     for(int i = 0; i < ImageHeight; i = i+2){
+        // Red pixels line
         for(int j = 0; j < ImageWidth; j = j+2){
             imageOut[i][j][1] = imageExtend[i+1][j+1][0];
         }
         for(int k = 1; k < ImageWidth; k = k+2){
-            imageOut[i][k][1] = (unsigned char)(int(imageExtend[i][k+1][0]) + int(imageExtend[i+1][k][0]) + int(imageExtend[i+2][k+1][0]) + int(imageExtend[i+1][k+2][0]))/4;
+            imageOut[i][k][1] = (unsigned char)((int(imageExtend[i+1][k][0]) + int(imageExtend[i+2][k+1][0]) + int(imageExtend[i+1][k+2][0]) + int(imageExtend[i][k+1][0]))/4);
         }
     }
     for(int i = 1; i < ImageHeight; i = i+2){
+        // Blue pixels line
         for(int j = 0; j < ImageWidth; j = j+2){
-            imageOut[i][j][1] = (unsigned char)(int(imageExtend[i][j+1][0]) + int(imageExtend[i+1][j][0]) + int(imageExtend[i+2][j+1][0]) + int(imageExtend[i+1][j+2][0]))/4;
+            imageOut[i][j][1] = (unsigned char)((int(imageExtend[i+1][j][0]) + int(imageExtend[i+2][j+1][0]) + int(imageExtend[i+1][j+2][0]) + int(imageExtend[i][j+1][0]))/4);
         }
         for(int k = 1; k < ImageWidth; k = k+2){
             imageOut[i][k][1] = imageExtend[i+1][k+1][0];
         }
     }
 
-    /** 
+    /** Blue Layer
     ** Green, Blue, Red pixels' blue values estimation by using Blue pixels
     **/
     for(int i = 0; i < ImageHeight; i = i+2){
         for(int j = 0; j < ImageWidth; j = j+2){
-            imageOut[i][j][2] = (unsigned char)(int(imageExtend[i][j+1][0]) + int(imageExtend[i+2][j+1][0]))/2;
+            imageOut[i][j][2] = (unsigned char)((int(imageExtend[i][j+1][0]) + int(imageExtend[i+2][j+1][0]))/2);
         }
         for(int k = 1; k < ImageWidth; k = k+2){
-            imageOut[i][k][2] = (unsigned char)(int(imageExtend[i][k][0]) + int(imageExtend[i+2][k][0]) + int(imageExtend[i+2][k+2][0]) + int(imageExtend[i][k+2][0]))/4;
+            imageOut[i][k][2] = (unsigned char)((int(imageExtend[i][k][0]) + int(imageExtend[i+2][k][0]) + int(imageExtend[i+2][k+2][0]) + int(imageExtend[i][k+2][0]))/4);
         }
     }
     for(int i = 1; i < ImageHeight; i = i+2){
@@ -133,14 +138,13 @@ int main(int argc, char *argv[]){
             imageOut[i][j][2] = imageExtend[i+1][j+1][0];
         }
         for(int k = 1; k < ImageWidth; k = k+2){
-            imageOut[i][k][2] = (unsigned char)(int(imageExtend[i+1][k][0]) + int(imageExtend[i+1][k+2][0]))/2;
+            imageOut[i][k][2] = (unsigned char)((int(imageExtend[i+1][k][0]) + int(imageExtend[i+1][k+2][0]))/2);
         }
     }
 
 
-
     // Todo: Store image
-    if(!(file=fopen(argv[2],"wb"))){
+    if(!(file = fopen(argv[2],"wb"))){
         cout << "Cannot open file: " << endl;
         exit(1);
     }
