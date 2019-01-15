@@ -90,7 +90,7 @@ int main(int argc, char *argv[]){
     for(int i = 1; i < ImageHeight; i = i+2){
         for(int j = 0; j < ImageWidth; j = j+2){
             // Red value at blue pixels position
-            imageOut[i][j][0] = (unsigned char) ( ( int(imageExtend[i][j][0]) + int(imageExtend[i][j+2][0]) + int(imageExtend[i+2][j][0]) + int(imageExtend[i+2][j+2][0]) )/4);
+            imageOut[i][j][0] = (unsigned char) ((int(imageExtend[i][j][0]) + int(imageExtend[i][j+2][0]) + int(imageExtend[i+2][j][0]) + int(imageExtend[i+2][j+2][0]) )/4);
         }
         for(int k = 1; k < ImageWidth; k = k+2){
             imageOut[i][k][0] = (unsigned char)((int(imageExtend[i][k+1][0]) + int(imageExtend[i+2][k+1][0]))/2);
