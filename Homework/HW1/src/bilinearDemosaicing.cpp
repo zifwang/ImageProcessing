@@ -70,7 +70,7 @@ int main(int argc, char *argv[]){
     // Step2: Apply Demosaicing method to the extended image
     // GRBG Bayers' Pattern and channels: RGB
     unsigned char imageOut[ImageHeight][ImageWidth][3];
-    /** 
+    /** Red Layer
     ** Green, Blue, Red pixels' red values estimation by using Red pixels
     **/
     // Red pixels line
@@ -91,12 +91,12 @@ int main(int argc, char *argv[]){
             imageOut[i][j][0] = (unsigned char)((int(imageExtend[i][j][0]) + int(imageExtend[i+2][j][0]) + int(imageExtend[i+2][j+2][0]) + int(imageExtend[i][j+2][0]))/4);
         }
         for(int k = 1; k < ImageWidth; k = k+2){
-            // Red value at green pixels position which in the same line as green pixels
+            // Red value at green pixels position which in the same line as blue pixels
             imageOut[i][k][0] = (unsigned char)((int(imageExtend[i][k+1][0]) + int(imageExtend[i+2][k+1][0]))/2);
         }
     }
 
-    /** 
+    /** Green Layer
     ** Green, Blue, Red pixels' green values estimation by using Green pixels
     **/
     for(int i = 0; i < ImageHeight; i = i+2){
@@ -109,6 +109,7 @@ int main(int argc, char *argv[]){
         }
     }
     for(int i = 1; i < ImageHeight; i = i+2){
+        // Blue pixels line
         for(int j = 0; j < ImageWidth; j = j+2){
             imageOut[i][j][1] = (unsigned char)((int(imageExtend[i+1][j][0]) + int(imageExtend[i+2][j+1][0]) + int(imageExtend[i+1][j+2][0]) + int(imageExtend[i][j+1][0]))/4);
         }
@@ -117,7 +118,7 @@ int main(int argc, char *argv[]){
         }
     }
 
-    /** 
+    /** Blue Layer
     ** Green, Blue, Red pixels' blue values estimation by using Blue pixels
     **/
     for(int i = 0; i < ImageHeight; i = i+2){
