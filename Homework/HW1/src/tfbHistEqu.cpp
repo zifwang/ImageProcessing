@@ -1,6 +1,5 @@
-// Problem 1. C. Histogram Manipulation: Transfer Function Based Hist. Equalization
+// Problem 1. C. Transfer Function Based Histogram Equalization
 // Author: Zifan Wang
-
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
@@ -34,7 +33,6 @@ int main(int argc, char *argv[]){
 		}
 	}
 
-
     // Todo: Read raw image into program and store it in array
     unsigned char imageData[ImageHeight][ImageWidth][BytesPerPixel];   // Image array to store .raw file
     if(file = fopen(argv[1],"rb")){
@@ -45,12 +43,20 @@ int main(int argc, char *argv[]){
     }
 
 
+
+
+
+
+
+
+
+
     // Todo: Store image
     if(!(file = fopen(argv[2],"wb"))){
         cout << "Cannot open file: " << endl;
         exit(1);
     }
-    fwrite(imageOut, sizeof(unsigned char), (ImageHeight)*(ImageWidth)*3, file);
+    fwrite(imageData, sizeof(unsigned char), (ImageHeight)*(ImageWidth)*3, file);
     fclose(file);
     
     return 0;
