@@ -62,6 +62,17 @@ int main(int argc, char *argv[]){
         }
     }
 
+    // Get cdf
+    double cdf[256][BytesPerPixel];
+    for(int channel = 0; channel < BytesPerPixel; channel++){
+        for(int i = 0; i < 256; i++){
+            double temp = double(histTable[i][channel])/ImageHeight/ImageWidth;
+            if(i == 0) cdf[i][channel] = temp;
+            else cdf[i][channel] = cdf[i-1][channel]+temp;
+        }
+    }
+
+
     // CPB Method requires each intensity value should have the same number of pixels in the image 
     // So, define this value as following
     int requiredNumPixels = ImageHeight*ImageWidth/256;     // If image is large, change int to long 
@@ -78,16 +89,31 @@ int main(int argc, char *argv[]){
                         else {
                             num = 0;
                             intensity++;
+                            if(intensity > 255) intensity = 255;
                         }
                         imageOut[h][w][channel] = (unsigned char)intensity;
-                        if(intensity > 255) imageOut[h][w][channel] = (unsigned char)255;
-                        if(intensity < 0) imageOut[h][w][channel] = (unsigned char)0;
                     }
                 }
             }
         }
     }
 
+    // Hew intensity histogram
+    int histTableMod[256][BytesPerPixel]; // grey-scale intensity: 0-255
+    // init. every intensity to 0
+    for(int channel = 0; channel < BytesPerPixel; channel++){
+        for(int i = 0; i < 256; i++){
+            histTableMod[i][channel] = 0;
+        }
+    }
+    // loop through all pixels and accumulate the count of the same intensity values
+    for(int channel = 0; channel < BytesPerPixel; channel++){
+        for(int i = 0; i < ImageHeight; i++){
+            for(int j = 0; j < ImageWidth; j++){
+                histTableMod[int(imageOut[i][j][channel])][channel]++;
+            }
+        }
+    }
 
     // TODO: Store image
     if(!(file = fopen(argv[2],"wb"))){
