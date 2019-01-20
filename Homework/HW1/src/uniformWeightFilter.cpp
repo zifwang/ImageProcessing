@@ -102,7 +102,7 @@ int main(int argc, char *argv[]){
                 for(int fh = -FilterHeight/2; fh <= FilterHeight/2; fh++){
                     for(int fw = -FilterWidth/2; fw <= FilterWidth/2; fw++){
                         // if(fh!=0 || fw!=0){
-                        sum = sum + double(imageExtend[h+fh][w+fw][channel])/double(FilterSize);
+                        sum = sum + double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel])/double(FilterSize);
                         // }
 
                     }
