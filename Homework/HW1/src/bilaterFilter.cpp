@@ -117,7 +117,7 @@ int main(int argc, char *argv[]){
                 for(int fh = -FilterHeight/2; fh <= FilterHeight/2; fh++){
                     for(int fw = -FilterWidth/2; fw <= FilterWidth/2; fw++){
                         double tempF = (pow(fh,2)+pow(fw,2))/(2*pow(sigma_c,2));
-                        double tempS = (pow(abs(double(imageExtend[h+FilterHeight][w+FilterWidth][channel]) - double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel])),2))/double(2*pow(sigma_s,2));
+                        double tempS = (pow(double(imageExtend[h+FilterHeight][w+FilterWidth][channel]) - double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel]),2))/double(2*pow(sigma_s,2));
                         double weight = exp(-tempF-tempS);
                         // cout << tempF << ", " << tempS << " ";
                         // cout << weight << endl;
