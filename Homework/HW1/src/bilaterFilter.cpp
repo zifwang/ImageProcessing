@@ -1,4 +1,4 @@
-// Problem 3. B. Gaussian Filter
+// Problem 3. C. Bilateral Filter
 // Author: Zifan Wang
 
 #include <stdio.h>
@@ -15,8 +15,10 @@ int main(int argc, char *argv[]){
     int BytesPerPixel = 3;                       // image is in gray scale, set this para. to 1. If RGB set to 3.
     int ImageHeight = 300, ImageWidth = 390;     // Image size
     int FilterHeight = 3, FilterWidth = 3;       // A square N*N size filter
-    double sigma = 2;                               // Gaussian Filter sigma value.
-    const double PI  = 3.141592653589793238463;   // Declare pi
+    double sigma = 3;                            // Gaussian Filter's sigma
+    const double PI  = 3.141592653589793238463;  // Declare pi
+    double sigma_c = 2;                          // bilateral filter's sigma_c 
+    double sigma_s = 3;                          // bilateral filter's sigma_s       
 
     // Check for proper syntax
 	if (argc < 3){
@@ -47,9 +49,16 @@ int main(int argc, char *argv[]){
             FilterHeight = FilterWidth = atoi(argv[6]);
             sigma = atoi(argv[7]);
         }
+        if (argc == 10){
+			ImageHeight = atoi(argv[4]);
+            ImageWidth = atoi(argv[5]);
+            FilterHeight = FilterWidth = atoi(argv[6]);
+            sigma = atoi(argv[7]);
+            sigma_c = atoi(argv[8]);
+            sigma_s = atoi(argv[9]);
+        }
+        
 	}
-
-    // cout << FilterHeight << " " <<FilterWidth << endl;
 
     // Todo: Read raw image into program and store it in array
     unsigned char imageData[ImageHeight][ImageWidth][BytesPerPixel];   // Image array to store .raw file
@@ -107,16 +116,22 @@ int main(int argc, char *argv[]){
                 double den = 0;
                 for(int fh = -FilterHeight/2; fh <= FilterHeight/2; fh++){
                     for(int fw = -FilterWidth/2; fw <= FilterWidth/2; fw++){
-                        double weight = 1/(sqrt(2*PI)*sigma)*exp(-((pow((h+fh-h),2))+(pow((w+fw-w),2)))/(2*pow(sigma,2)));
+                        double tempF = (pow(fh,2)+pow(fw,2))/(2*pow(sigma_c,2));
+                        double tempS = (pow(abs(double(imageExtend[h][w][channel]) - double(imageExtend[h+fh][w+fw][channel])),2))/double(2*pow(sigma_s,2));
+                        double weight = exp(-tempF-tempS);
+                        // cout << tempF << ", " << tempS << " ";
+                        // cout << weight << endl;
                         num = num + double(imageExtend[h+fh][w+fw][channel])*weight;
                         den = den + weight;
                     }
                 }
+                // cout << num << "," << den << ": " << num/den <<endl;
+                // cout << endl;
                 imageOut[h][w][channel] = (unsigned char) num/den;
             }
         }
     }
-
+    
 
     // Todo: Store image
     if(!(file = fopen(argv[2],"wb"))){
@@ -127,4 +142,4 @@ int main(int argc, char *argv[]){
     fclose(file);
     
     return 0;
-}    
+} 
