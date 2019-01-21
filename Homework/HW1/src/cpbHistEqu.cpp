@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <map>
 #include <vector>
+#include <fstream>
 
 using namespace std;
 
@@ -85,11 +86,11 @@ int main(int argc, char *argv[]){
                 for(int w = 0; w < ImageWidth; w++){
                     if(int(imageData[h][w][channel]) == i){
                         // if I(h,w) == intensity 
-                        if(num < requiredNumPixels) num++;
+                        if(num < requiredNumPixels-1) num++;
                         else {
                             num = 0;
                             intensity++;
-                            if(intensity > 255) intensity = 255;
+                            // if(intensity > 255) intensity = 255;
                         }
                         imageOut[h][w][channel] = (unsigned char)intensity;
                     }
@@ -114,6 +115,38 @@ int main(int argc, char *argv[]){
             }
         }
     }
+
+    ofstream outputHist("outputHistogram.txt");
+    if(outputHist.is_open()){
+        for(int channel = 0; channel < BytesPerPixel; channel++){
+            outputHist << "Channel: " << channel << endl;
+            for(int i = 0; i < 256; i++){
+                outputHist << histTableMod[i][channel] << endl;
+            }
+        }
+        outputHist.close();
+    }
+
+    int sumHistTable[256][BytesPerPixel];
+    for(int channel = 0; channel < BytesPerPixel; channel++){
+        int sum = 0;
+        for(int i = 0; i < 256; i++){
+            sum += histTableMod[channel][i];
+            sumHistTable[channel][i] = sum;
+        }
+    }
+
+    ofstream tfTxt("cpb_h.txt");
+    if(tfTxt.is_open()){
+        for(int channel = 0; channel < BytesPerPixel; channel++){
+            tfTxt << "Channel: " << channel << endl;
+            for(int i = 0; i < 256; i++){
+                tfTxt << sumHistTable[channel][i] << endl;
+            }
+        }
+        tfTxt.close();
+    }
+
 
     // TODO: Store image
     if(!(file = fopen(argv[2],"wb"))){

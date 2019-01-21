@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
+#include <fstream>
 
 using namespace std;
 
@@ -59,6 +60,18 @@ int main(int argc, char *argv[]){
             }
         }
     }
+    
+    ofstream inputHist("inputHistogram.txt");
+    if(inputHist.is_open()){
+        for(int channel = 0; channel < BytesPerPixel; channel++){
+            inputHist << "Channel: " << channel << endl;
+            for(int i = 0; i < 256; i++){
+                inputHist << histTable[channel][i] << endl;
+            }
+        }
+        inputHist.close();
+    }
+
     // // print function
     // for(int channel = 0; channel < BytesPerPixel; channel++){
     //     for(int i = 0; i < 256; i++){
@@ -133,6 +146,16 @@ int main(int argc, char *argv[]){
     //         cout << i << ": " << histTableMod[channel][i] << endl;
     //     }
     // }
+    ofstream outputHist("outputHistogram.txt");
+    if(outputHist.is_open()){
+        for(int channel = 0; channel < BytesPerPixel; channel++){
+            outputHist << "Channel: " << channel << endl;
+            for(int i = 0; i < 256; i++){
+                outputHist << histTableMod[i][channel] << endl;
+            }
+        }
+        outputHist.close();
+    }
 
     // Transfer function
     double tf[256][BytesPerPixel];
@@ -141,6 +164,18 @@ int main(int argc, char *argv[]){
             tf[i][channel] = double(sumHistTable[i][channel])/imageSize;
         }
     }
+
+    ofstream tfTxt("transferFunc.txt");
+    if(tfTxt.is_open()){
+        for(int channel = 0; channel < BytesPerPixel; channel++){
+            tfTxt << "Channel: " << channel << endl;
+            for(int i = 0; i < 256; i++){
+                tfTxt << tf[i][channel] << endl;
+            }
+        }
+        tfTxt.close();
+    }
+
     // // print function
     // for(int channel = 0; channel < BytesPerPixel; channel++){
     //     for(int i = 0; i < 256; i++){
