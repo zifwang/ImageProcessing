@@ -47,18 +47,19 @@ int main(int argc, char *argv[]){
 			ImageHeight = atoi(argv[4]);
             ImageWidth = atoi(argv[5]);
             FilterHeight = FilterWidth = atoi(argv[6]);
-            sigma = atoi(argv[7]);
+            sigma = stod(argv[7]);
         }
         if (argc == 10){
 			ImageHeight = atoi(argv[4]);
             ImageWidth = atoi(argv[5]);
             FilterHeight = FilterWidth = atoi(argv[6]);
-            sigma = atoi(argv[7]);
-            sigma_c = atoi(argv[8]);
-            sigma_s = atoi(argv[9]);
+            sigma = stod(argv[7]);
+            sigma_c = stod(argv[8]);
+            sigma_s = stod(argv[9]);
         }
         
 	}
+
 
     // Todo: Read raw image into program and store it in array
     unsigned char imageData[ImageHeight][ImageWidth][BytesPerPixel];   // Image array to store .raw file
@@ -116,8 +117,12 @@ int main(int argc, char *argv[]){
                 double den = 0;
                 for(int fh = -FilterHeight/2; fh <= FilterHeight/2; fh++){
                     for(int fw = -FilterWidth/2; fw <= FilterWidth/2; fw++){
-                        double tempF = (pow(fh,2)+pow(fw,2))/(2*pow(sigma_c,2));
-                        double tempS = (pow(double(imageExtend[h+FilterHeight][w+FilterWidth][channel]) - double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel]),2))/double(2*pow(sigma_s,2));
+                        double tempF = (fh*fh+fw*fw)/2/sigma_c/sigma_c;
+                        cout << double(imageExtend[h+FilterHeight][w+FilterWidth][channel]) << " " << double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel]);
+                        double tempS = double(imageExtend[h+FilterHeight][w+FilterWidth][channel]) - double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel]);
+                        tempS = tempS*tempS;
+                        tempS = tempS/2/sigma_s/sigma_s;
+                        cout << endl << tempS << endl;
                         double weight = exp(-tempF-tempS);
                         // cout << tempF << ", " << tempS << " ";
                         // cout << weight << endl;
@@ -125,6 +130,7 @@ int main(int argc, char *argv[]){
                         den = den + weight;
                     }
                 }
+                cout << endl;
                 // cout << num << "," << den << ": " << num/den <<endl;
                 // cout << endl;
                 imageOut[h][w][channel] = (unsigned char) num/den;
@@ -132,6 +138,7 @@ int main(int argc, char *argv[]){
         }
     }
     
+    cout << sigma_s << endl;
 
     // Todo: Store image
     if(!(file = fopen(argv[2],"wb"))){
