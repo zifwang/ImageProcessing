@@ -19,7 +19,7 @@ int main(int argc, char *argv[]){
     // Check for proper syntax
 	if (argc < 3){
 		cout << "Syntax Error - Incorrect Parameter Usage:" << endl;
-		cout << "program_name input_image.raw output_image.raw [BytesPerPixel = 1] [ImageHeight = 256] [ImageWidth = 256]" << endl;
+		cout << "program_name input_image.raw mod_image.raw [BytesPerPixel = 1] [ImageHeight = 256] [ImageWidth = 256]" << endl;
 		return 0;
 	}
 	
@@ -48,7 +48,7 @@ int main(int argc, char *argv[]){
 
     // TODO: Read raw mod image into program
     unsigned char imageDataMOD[ImageHeight][ImageWidth][BytesPerPixel];   // Image array to store .raw file
-    if(file = fopen(argv[1],"rb")){
+    if(file = fopen(argv[2],"rb")){
         fread(imageDataMOD,sizeof(unsigned char), ImageHeight*ImageWidth*BytesPerPixel, file);
     }else{
         cout << "Error opening file" << endl;
@@ -69,6 +69,7 @@ int main(int argc, char *argv[]){
         MSE  = MSE/(ImageHeight*ImageWidth*BytesPerPixel);
         PSNR = 10*log10(pow(255,2)/MSE);
         psnr << PSNR << endl;
+        cout << PSNR << endl;
     }
     psnr.close();
 
