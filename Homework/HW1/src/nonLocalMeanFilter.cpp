@@ -49,25 +49,25 @@ int main(int argc, char *argv[]){
 			ImageHeight = atoi(argv[4]);
             ImageWidth = atoi(argv[5]);
             FilterHeight = FilterWidth = atoi(argv[6]);
-            sigma = atoi(argv[7]);
+            sigma = stod(argv[7]);
         }
         if (argc == 10){
 			ImageHeight = atoi(argv[4]);
             ImageWidth = atoi(argv[5]);
             FilterHeight = FilterWidth = atoi(argv[6]);
-            sigma = atoi(argv[7]);
-            sigma_c = atoi(argv[8]);
-            sigma_s = atoi(argv[9]);
+            sigma = stod(argv[7]);
+            sigma_c = stod(argv[8]);
+            sigma_s = stod(argv[9]);
         }
         if (argc == 12){
 			ImageHeight = atoi(argv[4]);
             ImageWidth = atoi(argv[5]);
             FilterHeight = FilterWidth = atoi(argv[6]);
-            sigma = atoi(argv[7]);
-            sigma_c = atoi(argv[8]);
-            sigma_s = atoi(argv[9]);
+            sigma = stod(argv[7]);
+            sigma_c = stod(argv[8]);
+            sigma_s = stod(argv[9]);
             searchHeight = searchWidth = atoi(argv[10]);
-            filterParam = atoi(argv[11]);
+            filterParam = stod(argv[11]);
         }
         
 	}

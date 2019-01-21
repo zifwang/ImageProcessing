@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
 			ImageHeight = atoi(argv[4]);
             ImageWidth = atoi(argv[5]);
             FilterHeight = FilterWidth = atoi(argv[6]);
-            sigma = atoi(argv[7]);
+            sigma = stod(argv[7]);
         }
 	}
 
