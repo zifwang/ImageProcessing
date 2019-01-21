@@ -118,11 +118,11 @@ int main(int argc, char *argv[]){
                 for(int fh = -FilterHeight/2; fh <= FilterHeight/2; fh++){
                     for(int fw = -FilterWidth/2; fw <= FilterWidth/2; fw++){
                         double tempF = (fh*fh+fw*fw)/2/sigma_c/sigma_c;
-                        cout << double(imageExtend[h+FilterHeight][w+FilterWidth][channel]) << " " << double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel]);
+                        // cout << double(imageExtend[h+FilterHeight][w+FilterWidth][channel]) << " " << double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel]);
                         double tempS = double(imageExtend[h+FilterHeight][w+FilterWidth][channel]) - double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel]);
                         tempS = tempS*tempS;
                         tempS = tempS/2/sigma_s/sigma_s;
-                        cout << endl << tempS << endl;
+                        // cout << endl << tempS << endl;
                         double weight = exp(-tempF-tempS);
                         // cout << tempF << ", " << tempS << " ";
                         // cout << weight << endl;
@@ -130,7 +130,7 @@ int main(int argc, char *argv[]){
                         den = den + weight;
                     }
                 }
-                cout << endl;
+                // cout << endl;
                 // cout << num << "," << den << ": " << num/den <<endl;
                 // cout << endl;
                 imageOut[h][w][channel] = (unsigned char) num/den;
@@ -138,7 +138,7 @@ int main(int argc, char *argv[]){
         }
     }
     
-    cout << sigma_s << endl;
+    // cout << sigma_s << endl;
 
     // Todo: Store image
     if(!(file = fopen(argv[2],"wb"))){
