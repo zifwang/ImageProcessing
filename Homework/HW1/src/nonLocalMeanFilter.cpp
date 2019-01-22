@@ -134,14 +134,15 @@ int main(int argc, char *argv[]){
                         for(int sh = -searchHeight/2; sh <= searchHeight/2; sh++){
                             for(int sw = -searchWidth/2; sw <= searchWidth/2; sw++){
                                 double Ga = exp(-(sh*sh+sw*sw)/(2*sigma*sigma))/(sqrt(2*PI)*sigma);
-                                euclideanDis = euclideanDis + Ga * pow((double(imageExtend[h+FilterHeight+sh][w+FilterWidth+sh][channel])-double(imageExtend[h+FilterHeight+fh+sh][w+FilterWidth+fw+sw][channel])),2);
+                                euclideanDis = euclideanDis + Ga*pow((double(imageExtend[h+FilterHeight+sh][w+FilterWidth+sh][channel])-double(imageExtend[h+FilterHeight+fh+sh][w+FilterWidth+fw+sw][channel])),2);
                             }
                         }
+                        // euclideanDis = euclideanDis/FilterHeight/FilterSize;
                         weight = weight + exp(-euclideanDis/(filterParam*filterParam));
                         num = num + double(imageExtend[h+FilterHeight+fh][w+FilterHeight+fw][channel])*exp(-euclideanDis/(filterParam*filterParam));
                     }
                 }
-                imageOut[h][w][channel] = (unsigned char)num/weight;
+                imageOut[h][w][channel] = num/weight;
             }
         }
     }

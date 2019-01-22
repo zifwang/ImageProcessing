@@ -125,6 +125,7 @@ int main(int argc, char *argv[]){
     // Output Image
     unsigned char imageOut[ImageHeight][ImageWidth][BytesPerPixel];
     for(int channel = 0; channel < BytesPerPixel; channel++){
+        // cout << "channel: " << channel << endl;
         for(int h = 0; h < ImageHeight; h++){
             for(int w = 0; w < ImageWidth; w++){
                 int tempArray[FilterHeight*FilterHeight];
@@ -135,7 +136,14 @@ int main(int argc, char *argv[]){
                         i++;
                     }
                 }
+                
+                // for(int j = 0; j < i; j++){
+                //     cout << tempArray[j] << " ";
+                // }
+                // cout << endl;
+                // cout << "ori: " << double(imageExtend[h+FilterHeight][w+FilterWidth][channel]) << endl; 
                 imageOut[h][w][channel] = (unsigned char) GetMedian(tempArray,i);
+                // cout << "Mod: " << double(imageOut[h][w][channel]) << endl;
             }
         }
     }
