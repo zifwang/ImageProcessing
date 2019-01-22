@@ -123,7 +123,9 @@ int main(int argc, char *argv[]){
                         tempS = tempS*tempS;
                         tempS = tempS/2/sigma_s/sigma_s;
                         // cout << endl << tempS << endl;
-                        double weight = exp(-tempF-tempS);
+                        tempS = exp(-tempS)/(sqrt(2*PI)*sigma_s);
+                        tempF = exp(-tempF)/(sqrt(2*PI)*sigma_c);
+                        double weight = tempS*tempF;
                         // cout << tempF << ", " << tempS << " ";
                         // cout << weight << endl;
                         num = num + double(imageExtend[h+FilterHeight+fh][w+FilterWidth+fw][channel])*weight;
