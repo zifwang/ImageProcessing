@@ -72,6 +72,12 @@ int main(int argc, char *argv[]){
         
 	}
 
+	int extendHeight, extendWidth = 0;
+	if(searchHeight >=  FilterHeight) extendHeight = searchHeight;
+	else extendHeight = FilterHeight;
+	if(searchWidth >= FilterWidth) extendWidth = searchWidth;
+	else extendWidth = FilterWidth;
+
     // Todo: Read raw image into program and store it in array
     unsigned char imageData[ImageHeight][ImageWidth][BytesPerPixel];   // Image array to store .raw file
     if(file = fopen(argv[1],"rb")){
@@ -82,36 +88,36 @@ int main(int argc, char *argv[]){
     }
 
     // TDOO: Image Extension based on Filter Size
-    unsigned char imageTemp[ImageHeight+FilterHeight*2][ImageWidth][BytesPerPixel];
-    unsigned char imageExtend[ImageHeight+FilterHeight*2][ImageWidth+FilterWidth*2][BytesPerPixel];
+    unsigned char imageTemp[ImageHeight+extendHeight*2][ImageWidth][BytesPerPixel];
+    unsigned char imageExtend[ImageHeight+extendHeight*2][ImageWidth+extendWidth*2][BytesPerPixel];
     for(int channel = 0; channel < BytesPerPixel; channel++){
         // Extend height(row)
-        for(int h = 0; h < ImageHeight+FilterHeight*2; h++){
+        for(int h = 0; h < ImageHeight+extendHeight*2; h++){
             for(int w = 0; w < ImageWidth; w++){
-                if(h < FilterHeight){
-                    int actHeight = FilterHeight - h - 1;
+                if(h < extendHeight){
+                    int actHeight = extendHeight - h - 1;
                     imageTemp[h][w][channel] = imageData[actHeight][w][channel];
                 }
-                else if(h > ImageHeight+FilterHeight-1){
-                    int actHeight = ImageHeight - (h-ImageHeight) + (FilterHeight-1);
+                else if(h > ImageHeight+extendHeight-1){
+                    int actHeight = ImageHeight - (h-ImageHeight) + (extendHeight-1);
                     imageTemp[h][w][channel] = imageData[actHeight][w][channel];
                 }
-                else imageTemp[h][w][channel] = imageData[h-FilterHeight][w][channel];
+                else imageTemp[h][w][channel] = imageData[h-extendHeight][w][channel];
             }
         }
         // Extend width(col)
-        for(int w = 0; w < ImageWidth+FilterWidth*2; w++){
-            for(int h = 0; h < ImageHeight+FilterHeight*2; h++){
-                if(w < FilterWidth){
-                    int actWidth = FilterWidth - w - 1;
+        for(int w = 0; w < ImageWidth+extendWidth*2; w++){
+            for(int h = 0; h < ImageHeight+extendHeight*2; h++){
+                if(w < extendWidth){
+                    int actWidth = extendWidth - w - 1;
                     imageExtend[h][w][channel] = imageTemp[h][actWidth][channel];
                 }
-                else if(w > ImageWidth+FilterWidth-1){
-                    int actWidth = ImageWidth - (w-ImageWidth) + (FilterWidth-1);
+                else if(w > ImageWidth+extendWidth-1){
+                    int actWidth = ImageWidth - (w-ImageWidth) + (extendWidth-1);
                     imageExtend[h][w][channel] = imageTemp[h][actWidth][channel];
                 }
                 else{
-                    imageExtend[h][w][channel] = imageTemp[h][w-FilterWidth][channel];
+                    imageExtend[h][w][channel] = imageTemp[h][w-extendWidth][channel];
                 }
             }
         }
@@ -134,12 +140,12 @@ int main(int argc, char *argv[]){
                         for(int sh = -searchHeight/2; sh <= searchHeight/2; sh++){
                             for(int sw = -searchWidth/2; sw <= searchWidth/2; sw++){
                                 double Ga = exp(-(sh*sh+sw*sw)/(2*sigma*sigma))/(sqrt(2*PI)*sigma);
-                                euclideanDis = euclideanDis + Ga*pow((double(imageExtend[h+FilterHeight+sh][w+FilterWidth+sh][channel])-double(imageExtend[h+FilterHeight+fh+sh][w+FilterWidth+fw+sw][channel])),2);
+                                euclideanDis = euclideanDis + Ga*pow((double(imageExtend[h+extendWidth+sh][w+extendWidth+sh][channel])-double(imageExtend[h+extendHeight+fh+sh][w+extendWidth+fw+sw][channel])),2);
                             }
                         }
                         // euclideanDis = euclideanDis/FilterHeight/FilterSize;
                         weight = weight + exp(-euclideanDis/(filterParam*filterParam));
-                        num = num + double(imageExtend[h+FilterHeight+fh][w+FilterHeight+fw][channel])*exp(-euclideanDis/(filterParam*filterParam));
+                        num = num + double(imageExtend[h+extendWidth+fh][w+extendWidth+fw][channel])*exp(-euclideanDis/(filterParam*filterParam));
                     }
                 }
                 imageOut[h][w][channel] = num/weight;
