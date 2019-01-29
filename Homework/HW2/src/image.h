@@ -9,24 +9,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "flags.h"
-#include "pixels.h"
 
 using namespace std;
 
 class image{
-    // pixel** pixels;				            // pixel data array for image 
-
-
-    /**
-     * image data you want to access publicly
-     */ 
-    unsigned char *inputBuffer;
-
-    /**
-     * output image data used to write to file
-     */
-    unsigned char *outputData;
-
 public:
     /** 
      * Constructor: Init. private variable
@@ -36,7 +22,7 @@ public:
     /**
      * Default Constructor: Init. private variale to null
      */
-    // image_data();
+    image();
 
     /**
      * Read in file
@@ -49,9 +35,14 @@ public:
     void writeImage();
 
     /**
-     * Test function to test whether read and write function work
+     * Return 1-D array of input image
      */
-    void copy();
+    unsigned char* getInputImage();
+
+    /**
+     * Function used to set output image
+     */ 
+    void setOutputImage(unsigned char* imageMod,long imageSize);
 
     /** 
      * Return image height (int type)
@@ -80,4 +71,13 @@ private:
     std::string inputFilename;
     std::string outputFilename;
     std::string algorithm;
+    /**
+     * image data you want to access publicly
+     */ 
+    unsigned char *inputBuffer;
+
+    /**
+     * output image data used to write to file
+     */
+    unsigned char *outputBuffer;
 };

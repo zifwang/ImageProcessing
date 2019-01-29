@@ -18,14 +18,14 @@ image::image(FlagOptions flags){
 }
 
 // // Default Constructor:
-// image_data::image_data(){
-//     imageHeight = 0;
-//     imageWidth = 0;
-//     BytesPerPixel = 0;
-//     inputFilename = NULL;
-//     outputFilename = NULL;
-//     algorithm = NULL;
-// }
+image::image(){
+    imageHeight = 0;
+    imageWidth = 0;
+    BytesPerPixel = 0;
+    inputFilename = "";
+    outputFilename = "";
+    algorithm = "";
+}
 
 void image::readImage(){
     FILE *file;                                  // Read in file.
@@ -38,7 +38,7 @@ void image::readImage(){
 
         // allocate memory to contain the whole file:
         inputBuffer = (unsigned char*) malloc (sizeof(unsigned char)*lSize);
-        if (inputBuffer == NULL) {fputs ("Memory error",stderr); exit (2);}
+        if (inputBuffer == NULL) {fputs ("Memory error",stderr); exit (EXIT_FAILURE);}
 
         // copy the file into the buffer:
         fread(inputBuffer,1, lSize, file);
@@ -56,13 +56,21 @@ void image::writeImage(){
         cout << "Error opening file: " << outputFilename.c_str() << endl;
         exit(EXIT_FAILURE);
     }else{
-        fwrite(outputData, sizeof(unsigned char), imageHeight*imageWidth*BytesPerPixel, file);
+        fwrite(outputBuffer, sizeof(unsigned char), imageHeight*imageWidth*BytesPerPixel, file);
     }
     fclose(file);
 }
 
-void image::copy(){
-    outputData = inputBuffer;
+unsigned char* image::getInputImage(){
+    return inputBuffer;
+}
+
+void image::setOutputImage(unsigned char* imageMod,long imageSize){
+    // allocate memory to contain the whole file:
+    outputBuffer = (unsigned char*) malloc (sizeof(unsigned char)*imageSize);
+    if (outputBuffer == NULL) {fputs ("Memory error",stderr); exit (EXIT_FAILURE);}
+    // Store in OutputBuffer
+    outputBuffer = imageMod;
 }
 
 int image::getImageHeight(){

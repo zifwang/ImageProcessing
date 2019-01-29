@@ -1,3 +1,4 @@
-main.o: main.cpp flags.h image.h pixels.h
+main.o: main.cpp flags.h image.h RT.h
 flags.o: flags.cpp flags.h
-image.o: image.cpp image.h flags.h pixels.h
+image.o: image.cpp image.h flags.h
+RT.o: RT.cpp RT.h image.h flags.h
