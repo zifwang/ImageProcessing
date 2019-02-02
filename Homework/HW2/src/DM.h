@@ -32,20 +32,12 @@ public:
         set_indexMatrix_16();
         set_indexMatrix_32();
         
-        double imageTemp[imageHeight][imageWidth];
-        for(int i = 0; i < imageHeight; i++){
-            for(int j = 0; j < imageWidth; j++){
-                imageTemp[i][j] = (double)inputBuffer[i*imageWidth+j];
-            }
-        }
-
-
         unsigned char imageOut[imageHeight][imageWidth];
         if(indexNumber == 2){
             // 2 indexMatrix
             for(int i = 0; i < imageHeight; i++){
                 for(int j = 0; j < imageWidth; j++){
-                    if(imageTemp[i][j] <= (indexMatrix_2[i%2][j%2]+0.5)/2/2*255){
+                    if((double)input2DImage[i][j] <= (indexMatrix_2[i%2][j%2]+0.5)/2/2*255){
                         imageOut[i][j] = (unsigned char)0;
                     }
                     else{
@@ -57,7 +49,7 @@ public:
         else if(indexNumber == 8){
             for(int i = 0; i < imageHeight; i++){
                 for(int j = 0; j < imageWidth; j++){
-                    if(imageTemp[i][j] <= (indexMatrix_8[i%8][j%8]+0.5)/8/8*255){
+                    if((double)input2DImage[i][j] <= (indexMatrix_8[i%8][j%8]+0.5)/8/8*255){
                         imageOut[i][j] = (unsigned char)0;
                     }
                     else{
@@ -69,7 +61,7 @@ public:
         else if(indexNumber == 16){
             for(int i = 0; i < imageHeight; i++){
                 for(int j = 0; j < imageWidth; j++){
-                    if(imageTemp[i][j] <= (indexMatrix_16[i%16][j%16]+0.5)/16/16*255){
+                    if((double)input2DImage[i][j] <= (indexMatrix_16[i%16][j%16]+0.5)/16/16*255){
                         imageOut[i][j] = (unsigned char)0;
                     }
                     else{
@@ -81,7 +73,7 @@ public:
         else if(indexNumber = 32){
             for(int i = 0; i < imageHeight; i++){
                 for(int j = 0; j < imageWidth; j++){
-                    if(imageTemp[i][j] <= (indexMatrix_32[i%32][j%32]+0.5)/32/32*255){
+                    if((double)input2DImage[i][j] <= (indexMatrix_32[i%32][j%32]+0.5)/32/32*255){
                         imageOut[i][j] = (unsigned char)0;
                     }
                     else{

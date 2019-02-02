@@ -7,7 +7,16 @@
 
 class errorDiffusion : public half_tonning_algorithm{
 public:
+    void methodErrorDiffusion(){
+        unsigned char** extendedInputImage = imageExtension(inputBuffer,imageHeight,imageWidth,3);
 
+        // set outputBuffer
+        for(int i = 0; i < imageHeight; i++){
+            for(int j = 0; j < imageWidth; j++){
+                outputBuffer[i*imageWidth+j] = extendedInputImage[i][j];
+            }
+        }
+    }
 
 
 
@@ -30,4 +39,4 @@ private:
                                  {0,0,0,8/42,4/42},
                                  {2/42,4/42,8/42,4/42,2/42},
                                  {1/42,2/42,4/42,2/42,1/42}};
-}
+};
