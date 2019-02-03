@@ -32,7 +32,7 @@ int main(int argc, char** argv){
     // put into Error Diffusion method
     errorDiffusion erImage;
     erImage.init_image(imageData);
-    erImage.methodErrorDiffusion();
+    erImage.methodErrorDiffusion("JJN");
     imageData.setOutputImage(erImage.output(),erImage.getImageSize());
     imageData.writeImage();
     return 0;
