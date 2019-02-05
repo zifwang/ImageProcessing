@@ -18,7 +18,9 @@ public:
         BytesPerPixel = inputImage.getBytesPerPixel();
         imageSize = imageHeight*imageWidth*BytesPerPixel;
         inputBuffer = inputImage.getInputImage();
-        input2DImage = oneDTOtwoD(inputBuffer,imageHeight,imageWidth);
+        if(BytesPerPixel == 1){
+            input2DImage = oneDTOtwoD(inputBuffer,imageHeight,imageWidth);
+        }
         // allocate memory to contain the whole file:
         outputBuffer = (unsigned char*) malloc (sizeof(unsigned char)*imageSize);
         if (outputBuffer == NULL) {
@@ -58,7 +60,7 @@ protected:
     unsigned char *outputBuffer;        // Output image
 
     /**
-     * Function to calculate 2D image
+     * Function to calculate 2D image(only for gray-scale)
     */ 
     unsigned char** oneDTOtwoD(unsigned char* inputImage, int height, int width){
         unsigned char** outputImage;
@@ -74,11 +76,12 @@ protected:
         }
         return outputImage;
     }
-
+    
     /**
      * Function to extend input image depending on filter's size
+     * There are some bugs need to be fixed
      */
-    unsigned char** imageExtension(unsigned char* inputImage, int height, int width, int filterSize){
+    unsigned char** imageExtentsion(unsigned char* inputImage, int height, int width, int filterSize){
         // Resize 1D image array to 2D image array
         unsigned char** tempImage = oneDTOtwoD(inputImage,height,width);
 
