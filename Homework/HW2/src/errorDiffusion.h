@@ -4,196 +4,204 @@
 #include "half_tonning_algorithm.h"
 #include <iostream>
 #include <string>
+#include <stdlib.h>
+#include <fstream>
+#include <stdio.h>
 
 class errorDiffusion : public half_tonning_algorithm{
 public:
     void methodErrorDiffusion(string algorithm){
-        double* oriInputImage = normalizeImage(inputBuffer,imageHeight,imageWidth);
-        unsigned char ouputImage[imageHeight][imageWidth];
 
-        // if(algorithm == "steinberg"){
-        //     double** extendedInputImage = imageExtension_double(oriInputImage,imageHeight,imageWidth,3);
-        //     double error = 0;
-        //     for(int i = 0; i < imageHeight; i++){
-        //         if(i%2 == 0){
-        //             for(int j = 0; j < imageWidth; j++){
-        //                 if(extendedInputImage[i+1][j+1] > threshold) {
-        //                     error = extendedInputImage[i+1][j+1] -1;
-        //                     ouputImage[i][j] = (unsigned char)255;
-        //                 }else{
-        //                     error = extendedInputImage[i+1][j+1];
-        //                     ouputImage[i][j] = (unsigned char)0;
-        //                 }
-        //                 // error dist.
-        //                 extendedInputImage[i+1][j+1+1] = extendedInputImage[i+1][j+1+1] * STEINBERG[1][2]*error;
-        //                 extendedInputImage[i+1+1][j+1-1] = extendedInputImage[i+1+1][j+1-1] * STEINBERG[2][0]*error;
-        //                 extendedInputImage[i+1+1][j+1+0] = extendedInputImage[i+1+1][j+1+0] * STEINBERG[2][1]*error;
-        //                 extendedInputImage[i+1+1][j+1+1] = extendedInputImage[i+1+1][j+1+1] * STEINBERG[2][2]*error;
-        //             }
-        //         }
-        //         else{
-        //             for(int j = imageWidth-1; j >= 0; j--){
-        //                 if(extendedInputImage[i+1][j+1] > threshold) {
-        //                     error = extendedInputImage[i+1][j+1] -1;
-        //                     ouputImage[i][j] = (unsigned char)255;
-        //                 }else{
-        //                     error = extendedInputImage[i+1][j+1];
-        //                     ouputImage[i][j] = (unsigned char)0;
-        //                 }
-        //                 // error dist.
-        //                 extendedInputImage[i+1][j+1-1] = extendedInputImage[i+1][j+1-1] * STEINBERG[1][2]*error;
-        //                 extendedInputImage[i+1+1][j+1-1] = extendedInputImage[i+1+1][j+1-1] * STEINBERG[2][2]*error;
-        //                 extendedInputImage[i+1+1][j+1+0] = extendedInputImage[i+1+1][j+1+0] * STEINBERG[2][1]*error;
-        //                 extendedInputImage[i+1+1][j+1+1] = extendedInputImage[i+1+1][j+1+1] * STEINBERG[2][0]*error;
-        //             }
-        //         }
-        //     }
-        // }
-        // else if(algorithm == "JJN"){
-        //     double** extendedInputImage = imageExtension_double(oriInputImage,imageHeight,imageWidth,5);
-        //     double error = 0;
+        unsigned char imageOut[imageHeight][imageWidth];
 
-        //     for(int i = 0; i < imageHeight; i++){
-        //         if(i%2 == 0){
-        //             for(int j = 0; j < imageWidth; j++){
-        //                 if(extendedInputImage[i+2][j+2] > threshold) {
-        //                     error = extendedInputImage[i+2][j+2] -1;
-        //                     ouputImage[i][j] = (unsigned char)255;
-        //                 }else{
-        //                     error = extendedInputImage[i+2][j+2];
-        //                     ouputImage[i][j] = (unsigned char)0;
-        //                 }
-        //                 // error dist.
-        //                 extendedInputImage[i+2][j+2+1] = extendedInputImage[i+2][j+2+1] + error * JJN[2][3];
-        //                 extendedInputImage[i+2][j+2+2] = extendedInputImage[i+2][j+2+2] + error * JJN[2][4];
-        //                 extendedInputImage[i+2+1][j+2-2] = extendedInputImage[i+2+1][j+2-2] + error * JJN[3][0];
-        //                 extendedInputImage[i+2+1][j+2-1] = extendedInputImage[i+2+1][j+2-1] + error * JJN[3][1];
-        //                 extendedInputImage[i+2+1][j+2+0] = extendedInputImage[i+2+1][j+2+0] + error * JJN[3][2];
-        //                 extendedInputImage[i+2+1][j+2+1] = extendedInputImage[i+2+1][j+2+1] + error * JJN[3][3];
-        //                 extendedInputImage[i+2+1][j+2+2] = extendedInputImage[i+2+1][j+2+2] + error * JJN[3][4];
-        //                 extendedInputImage[i+2+2][j+2-2] = extendedInputImage[i+2+2][j+2-2] + error * JJN[4][0];
-        //                 extendedInputImage[i+2+2][j+2-1] = extendedInputImage[i+2+2][j+2-1] + error * JJN[4][1];
-        //                 extendedInputImage[i+2+2][j+2+0] = extendedInputImage[i+2+2][j+2+0] + error * JJN[4][2];
-        //                 extendedInputImage[i+2+2][j+2+1] = extendedInputImage[i+2+2][j+2+1] + error * JJN[4][3];
-        //                 extendedInputImage[i+2+2][j+2+2] = extendedInputImage[i+2+2][j+2+2] + error * JJN[4][4];
-        //             }
-        //         }
-        //         else{
-        //             for(int j = imageWidth-1; j >= 0; j++){
-        //                 if(extendedInputImage[i+2][j+2] > threshold) {
-        //                     error = extendedInputImage[i+2][j+2] -1;
-        //                     ouputImage[i][j] = (unsigned char)255;
-        //                 }else{
-        //                     error = extendedInputImage[i+2][j+2];
-        //                     ouputImage[i][j] = (unsigned char)0;
-        //                 }
-        //                 // error dist.
-        //                 extendedInputImage[i+2][j+2-1] = extendedInputImage[i+2][j+2-1] + error * JJN[2][3];
-        //                 extendedInputImage[i+2][j+2-2] = extendedInputImage[i+2][j+2-2] + error * JJN[2][4];
-        //                 extendedInputImage[i+2+1][j+2-2] = extendedInputImage[i+2+1][j+2-2] + error * JJN[3][4];
-        //                 extendedInputImage[i+2+1][j+2-1] = extendedInputImage[i+2+1][j+2-1] + error * JJN[3][3];
-        //                 extendedInputImage[i+2+1][j+2+0] = extendedInputImage[i+2+1][j+2+0] + error * JJN[3][2];
-        //                 extendedInputImage[i+2+1][j+2+1] = extendedInputImage[i+2+1][j+2+1] + error * JJN[3][1];
-        //                 extendedInputImage[i+2+1][j+2+2] = extendedInputImage[i+2+1][j+2+2] + error * JJN[3][0];
-        //                 extendedInputImage[i+2+2][j+2-2] = extendedInputImage[i+2+2][j+2-2] + error * JJN[4][4];
-        //                 extendedInputImage[i+2+2][j+2-1] = extendedInputImage[i+2+2][j+2-1] + error * JJN[4][3];
-        //                 extendedInputImage[i+2+2][j+2+0] = extendedInputImage[i+2+2][j+2+0] + error * JJN[4][2];
-        //                 extendedInputImage[i+2+2][j+2+1] = extendedInputImage[i+2+2][j+2+1] + error * JJN[4][1];
-        //                 extendedInputImage[i+2+2][j+2+2] = extendedInputImage[i+2+2][j+2+2] + error * JJN[4][0];
-        //             }
-        //         }
-        //     }
-        // }
-        // else if(algorithm == "STUCKI"){
-        //     double** extendedInputImage = imageExtension_double(oriInputImage,imageHeight,imageWidth,5);
-        //     double error = 0;
+        double tmp[imageHeight][imageWidth];
+        // Change input image type
+        for(int i = 0; i < imageHeight; i++){
+            for(int j = 0; j < imageWidth; j++){
+                tmp[i][j] = (double)input2DImage[i][j];
+            }
+        }
 
-        //     for(int i = 0; i < imageHeight; i++){
-        //         if(i%2 == 0){
-        //             for(int j = 0; j < imageWidth; j++){
-        //                 if(extendedInputImage[i+2][j+2] > threshold) {
-        //                     error = extendedInputImage[i+2][j+2] -1;
-        //                     ouputImage[i][j] = (unsigned char)255;
-        //                 }else{
-        //                     error = extendedInputImage[i+2][j+2];
-        //                     ouputImage[i][j] = (unsigned char)0;
-        //                 }
-        //                 // error dist.
-        //                 extendedInputImage[i+2][j+2+1] = extendedInputImage[i+2][j+2+1] + error * STUCKI[2][3];
-        //                 extendedInputImage[i+2][j+2+2] = extendedInputImage[i+2][j+2+2] + error * STUCKI[2][4];
-        //                 extendedInputImage[i+2+1][j+2-2] = extendedInputImage[i+2+1][j+2-2] + error * STUCKI[3][0];
-        //                 extendedInputImage[i+2+1][j+2-1] = extendedInputImage[i+2+1][j+2-1] + error * STUCKI[3][1];
-        //                 extendedInputImage[i+2+1][j+2+0] = extendedInputImage[i+2+1][j+2+0] + error * STUCKI[3][2];
-        //                 extendedInputImage[i+2+1][j+2+1] = extendedInputImage[i+2+1][j+2+1] + error * STUCKI[3][3];
-        //                 extendedInputImage[i+2+1][j+2+2] = extendedInputImage[i+2+1][j+2+2] + error * STUCKI[3][4];
-        //                 extendedInputImage[i+2+2][j+2-2] = extendedInputImage[i+2+2][j+2-2] + error * STUCKI[4][0];
-        //                 extendedInputImage[i+2+2][j+2-1] = extendedInputImage[i+2+2][j+2-1] + error * STUCKI[4][1];
-        //                 extendedInputImage[i+2+2][j+2+0] = extendedInputImage[i+2+2][j+2+0] + error * STUCKI[4][2];
-        //                 extendedInputImage[i+2+2][j+2+1] = extendedInputImage[i+2+2][j+2+1] + error * STUCKI[4][3];
-        //                 extendedInputImage[i+2+2][j+2+2] = extendedInputImage[i+2+2][j+2+2] + error * STUCKI[4][4];
-        //             }
-        //         }
-        //         else{
-        //             for(int j = imageWidth-1; j >= 0; j++){
-        //                 if(extendedInputImage[i+2][j+2] > threshold) {
-        //                     error = extendedInputImage[i+2][j+2] -1;
-        //                     ouputImage[i][j] = (unsigned char)255;
-        //                 }else{
-        //                     error = extendedInputImage[i+2][j+2];
-        //                     ouputImage[i][j] = (unsigned char)0;
-        //                 }
-        //                 // error dist.
-        //                 extendedInputImage[i+2][j+2-1] = extendedInputImage[i+2][j+2-1] + error * STUCKI[2][3];
-        //                 extendedInputImage[i+2][j+2-2] = extendedInputImage[i+2][j+2-2] + error * STUCKI[2][4];
-        //                 extendedInputImage[i+2+1][j+2-2] = extendedInputImage[i+2+1][j+2-2] + error * STUCKI[3][4];
-        //                 extendedInputImage[i+2+1][j+2-1] = extendedInputImage[i+2+1][j+2-1] + error * STUCKI[3][3];
-        //                 extendedInputImage[i+2+1][j+2+0] = extendedInputImage[i+2+1][j+2+0] + error * STUCKI[3][2];
-        //                 extendedInputImage[i+2+1][j+2+1] = extendedInputImage[i+2+1][j+2+1] + error * STUCKI[3][1];
-        //                 extendedInputImage[i+2+1][j+2+2] = extendedInputImage[i+2+1][j+2+2] + error * STUCKI[3][0];
-        //                 extendedInputImage[i+2+2][j+2-2] = extendedInputImage[i+2+2][j+2-2] + error * STUCKI[4][4];
-        //                 extendedInputImage[i+2+2][j+2-1] = extendedInputImage[i+2+2][j+2-1] + error * STUCKI[4][3];
-        //                 extendedInputImage[i+2+2][j+2+0] = extendedInputImage[i+2+2][j+2+0] + error * STUCKI[4][2];
-        //                 extendedInputImage[i+2+2][j+2+1] = extendedInputImage[i+2+2][j+2+1] + error * STUCKI[4][1];
-        //                 extendedInputImage[i+2+2][j+2+2] = extendedInputImage[i+2+2][j+2+2] + error * STUCKI[4][0];
-        //             }
-        //         }
-        //     }
-        // }
-        // else{
-        //     cout << "Error inputing error diffusion algorithm." << endl;
-        //     exit(EXIT_FAILURE);
-        // }
+        if(algorithm == "steinberg"){
+            double error;
+            for(int i = 0; i < imageHeight; i++){
+                if(i%2 == 0){
+                    for(int j = 0; j < imageWidth; j++){
+                        // compare to the threshold
+                        if(tmp[i][j]>=threshold){
+                            error = tmp[i][j]-255;
+                            imageOut[i][j] = (unsigned char) 255;
+                        }
+                        else{
+                            error = tmp[i][j]-0;
+                            imageOut[i][j] = (unsigned char) 0;
+                        }
+                        // error dist.
+                        if(j+1 < imageWidth) tmp[i][j+1] = tmp[i][j+1] + error*7/16;
+                        if(j-1 >= 0 && i+1 < imageHeight) tmp[i+1][j-1] = tmp[i+1][j-1] + error*3/16;
+                        if(i+1 < imageHeight) tmp[i+1][j] = tmp[i+1][j] + error*5/16;
+                        if(i+1 < imageHeight && j+1 < imageWidth) tmp[i+1][j+1] = tmp[i+1][j+1] + error*1/16;
+                    }
+                }
+                else{
+                    for(int j = imageWidth-1; j >= 0; j--){
+                        // compare to the threshold
+                        if(tmp[i][j]>=threshold){
+                            error = tmp[i][j]-255;
+                            imageOut[i][j] = (unsigned char) 255;
+                        }
+                        else{
+                            error = tmp[i][j]-0;
+                            imageOut[i][j] = (unsigned char) 0;
+                        }
+                        // error dist.
+                        if(j > 0) tmp[i][j-1] = tmp[i][j-1] + error*7/16;
+                        if(j > 0 && i+1 < imageHeight) tmp[i+1][j-1] = tmp[i+1][j-1] + error*1/16;
+                        if(i+1 < imageHeight) tmp[i+1][j] = tmp[i+1][j] + error*5/16;
+                        if(j < imageWidth-1 && i+1 < imageHeight) tmp[i+1][j+1] = tmp[i+1][j+1]+error*3/16;
+                    }
+                }
+            }
+        }
+        else if(algorithm == "JJN"){
+            double error = 0;
+            for(int i = 0; i < imageHeight; i++){
+                if(i%2 == 0){
+                    for(int j = 0; j < imageWidth; j++){
+                        if(tmp[i][j] >= threshold) {
+                            error = tmp[i][j] - 255;
+                            imageOut[i][j] = (unsigned char)255;
+                        }else{
+                            error = tmp[i][j];
+                            imageOut[i][j] = (unsigned char)0;
+                        }
+                        // error dist.
+                        if(j < imageWidth-1) tmp[i][j+1] = tmp[i][j+1] + error * 7/48;
+                        if(j < imageWidth-2) tmp[i][j+2] = tmp[i][j+2] + error * 5/48;
+                        if(j > 1 && i < imageHeight-1) tmp[i+1][j-2] = tmp[i+1][j-2] + error * 3/48;
+                        if(j > 0 && i < imageHeight-1) tmp[i+1][j-1] = tmp[i+1][j-1] + error * 5/48;
+                        if(i < imageHeight-1) tmp[i+1][j+0] = tmp[i+1][j+0] + error * 7/48;
+                        if(j < imageWidth-1 && i < imageHeight-1) tmp[i+1][j+1] = tmp[i+1][j+1] + error * 5/48;
+                        if(j < imageWidth-2 && i < imageHeight-1) tmp[i+1][j+2] = tmp[i+1][j+2] + error * 3/48;
+                        if(j > 1 && i < imageHeight-2) tmp[i+2][j-2] = tmp[i+2][j-2] + error * 1/48;
+                        if(j > 0 && i < imageHeight-2) tmp[i+2][j-1] = tmp[i+2][j-1] + error * 3/48;
+                        if(i < imageHeight-2) tmp[i+2][j+0] = tmp[i+2][j+0] + error * 5/48;
+                        if(j < imageWidth-1 && i < imageHeight-2) tmp[i+2][j+1] = tmp[i+2][j+1] + error * 3/48;
+                        if(j < imageWidth-2 && i < imageHeight-2) tmp[i+2][j+2] = tmp[i+2][j+2] + error * 1/48;
+                    }
+                }
+                else{
+                    for(int j = imageWidth-1; j >= 0; j--){
+                        if(tmp[i][j] >= threshold) {
+                            error = tmp[i][j] - 255;
+                            imageOut[i][j] = (unsigned char)255;
+                        }else{
+                            error = tmp[i][j];
+                            imageOut[i][j] = (unsigned char)0;
+                        }
+                        // error dist.
+                        if(j > 0) tmp[i][j-1] = tmp[i][j-1] + error * 7/48;
+                        if(j > 1) tmp[i][j-2] = tmp[i][j-2] + error * 5/48;
+                        if(j > 1 && i < imageHeight-1) tmp[i+1][j-2] = tmp[i+1][j-2] + error * 3/48;
+                        if(j > 0 && i < imageHeight-1) tmp[i+1][j-1] = tmp[i+1][j-1] + error * 5/48;
+                        if(i < imageHeight-1) tmp[i+1][j+0] = tmp[i+1][j+0] + error * 7/48;
+                        if(j < imageWidth-1 && i < imageHeight-1) tmp[i+1][j+1] = tmp[i+1][j+1] + error * 5/48;
+                        if(j < imageWidth-2 && i < imageHeight-1)tmp[i+1][j+2] = tmp[i+1][j+2] + error * 3/48;
+                        if(j > 1 && i < imageHeight-2) tmp[i+2][j-2] = tmp[i+2][j-2] + error * 1/48;
+                        if(j > 0 && i < imageHeight-2) tmp[i+2][j-1] = tmp[i+2][j-1] + error * 3/48;
+                        if(i < imageHeight-2) tmp[i+2][j+0] = tmp[i+2][j+0] + error * 1/48;
+                        if(j < imageWidth-1 && i < imageHeight-2) tmp[i+2][j+1] = tmp[i+2][j+1] + error * 3/48;
+                        if(j < imageWidth-2 && i < imageHeight-2) tmp[i+2][j+2] = tmp[i+2][j+2] + error * 1/48;
+                    }
+                }
+            }
+        }
+        else if(algorithm == "Stucki"){
+            double error = 0;
+            for(int i = 0; i < imageHeight; i++){
+                if(i%2 == 0){
+                    for(int j = 0; j < imageWidth; j++){
+                        if(tmp[i][j] >= threshold) {
+                            error = tmp[i][j] - 255;
+                            imageOut[i][j] = (unsigned char)255;
+                        }else{
+                            error = tmp[i][j];
+                            imageOut[i][j] = (unsigned char)0;
+                        }
+                        // error dist.
+                        if(j < imageWidth-1) tmp[i][j+1] = tmp[i][j+1] + error * 8/42;
+                        if(j < imageWidth-2) tmp[i][j+2] = tmp[i][j+2] + error * 4/42;
+                        if(j > 1 && i < imageHeight-1) tmp[i+1][j-2] = tmp[i+1][j-2] + error * 2/42;
+                        if(j > 0 && i < imageHeight-1) tmp[i+1][j-1] = tmp[i+1][j-1] + error * 4/42;
+                        if(i < imageHeight-1) tmp[i+1][j+0] = tmp[i+1][j+0] + error * 8/42;
+                        if(j < imageWidth-1 && i < imageHeight-1) tmp[i+1][j+1] = tmp[i+1][j+1] + error * 4/42;
+                        if(j < imageWidth-2 && i < imageHeight-1) tmp[i+1][j+2] = tmp[i+1][j+2] + error * 2/42;
+                        if(j > 1 && i < imageHeight-2) tmp[i+2][j-2] = tmp[i+2][j-2] + error * 1/42;
+                        if(j > 0 && i < imageHeight-2) tmp[i+2][j-1] = tmp[i+2][j-1] + error * 2/42;
+                        if(i < imageHeight-2) tmp[i+2][j+0] = tmp[i+2][j+0] + error * 4/42;
+                        if(j < imageWidth-1 && i < imageHeight-2) tmp[i+2][j+1] = tmp[i+2][j+1] + error * 2/42;
+                        if(j < imageWidth-2 && i < imageHeight-2) tmp[i+2][j+2] = tmp[i+2][j+2] + error * 1/42;
+                    }
+                }
+                else{
+                    for(int j = imageWidth-1; j >= 0; j--){
+                        if(tmp[i][j] >= threshold) {
+                            error = tmp[i][j] - 255;
+                            imageOut[i][j] = (unsigned char)255;
+                        }else{
+                            error = tmp[i][j];
+                            imageOut[i][j] = (unsigned char)0;
+                        }
+                        // error dist.
+                        if(j > 0) tmp[i][j-1] = tmp[i][j-1] + error * 8/42;
+                        if(j > 1) tmp[i][j-2] = tmp[i][j-2] + error * 4/42;
+                        if(j > 1 && i < imageHeight-1) tmp[i+1][j-2] = tmp[i+1][j-2] + error * 2/42;
+                        if(j > 0 && i < imageHeight-1) tmp[i+1][j-1] = tmp[i+1][j-1] + error * 4/42;
+                        if(i < imageHeight-1) tmp[i+1][j+0] = tmp[i+1][j+0] + error * 8/42;
+                        if(j < imageWidth-1 && i < imageHeight-1) tmp[i+1][j+1] = tmp[i+1][j+1] + error * 4/42;
+                        if(j < imageWidth-2 && i < imageHeight-1)tmp[i+1][j+2] = tmp[i+1][j+2] + error * 2/42;
+                        if(j > 1 && i < imageHeight-2) tmp[i+2][j-2] = tmp[i+2][j-2] + error * 1/42;
+                        if(j > 0 && i < imageHeight-2) tmp[i+2][j-1] = tmp[i+2][j-1] + error * 2/42;
+                        if(i < imageHeight-2) tmp[i+2][j+0] = tmp[i+2][j+0] + error * 4/42;
+                        if(j < imageWidth-1 && i < imageHeight-2) tmp[i+2][j+1] = tmp[i+2][j+1] + error * 2/42;
+                        if(j < imageWidth-2 && i < imageHeight-2) tmp[i+2][j+2] = tmp[i+2][j+2] + error * 1/42;
+                    }
+                }
+            }
+        }
+        else{
+            cout << "Error inputing error diffusion algorithm." << endl;
+            exit(EXIT_FAILURE);
+        }
 
 
-        // // set outputBuffer
-        // for(int i = 0; i < imageHeight; i++){
-        //     for(int j = 0; j < imageWidth; j++){
-        //         outputBuffer[i*imageWidth+j] = ouputImage[i][j];
-        //     }
-        // }
-    }
+        // set outputBuffer
+        for(int i = 0; i < imageHeight; i++){
+            for(int j = 0; j < imageWidth; j++){
+                outputBuffer[i*imageWidth+j] = imageOut[i][j];
+            }
+        }
+}
 
 
 
 private:
-    double threshold = 0.5;    // Error diffusion threshold
+    double threshold = 127;    // Error diffusion threshold
 
     // Floyd-Steinberg’s error diffusion with the serpentine scanning
-    const double STEINBERG[3][3] = {{0,0,0},
-                                    {0,0,7/16},
-                                    {3/16,5/16,1/16}};
+    double STEINBERG[3][3] = {0,0,0,0,0,7/16,3/16,5/16,1/16};
 
     // Error diffusion proposed by Jarvis, Judice, and Ninke (JJN)
-    const double JJN[5][5] = {{0,0,0,0,0},
-                              {0,0,0,0,0},
-                              {0,0,0,7/48,5/48},
-                              {3/48,5/48,7/48,5/48,3/48},
-                              {1/48,3/48,5/48,3/48,1/48}};
+    double JJN[5][5] = {{0.0,0.0,0.0,0.0,0.0},
+                        {0.0,0.0,0.0,0.0,0.0},
+                        {0.0,0.0,0.0,7/48,5/48},
+                        {3/48,5/48,7/48,5/48,3/48},
+                        {1/48,3/48,5/48,3/48,1/48}};
 
     // Error diffusion proposed by Stucki
-    const double STUCKI[5][5] = {{0,0,0,0,0},
-                                 {0,0,0,0,0},
-                                 {0,0,0,8/42,4/42},
-                                 {2/42,4/42,8/42,4/42,2/42},
-                                 {1/42,2/42,4/42,2/42,1/42}};
+    double STUCKI[5][5] = {{0,0,0,0,0},
+                            {0,0,0,0,0},
+                            {0,0,0,8/42,4/42},
+                            {2/42,4/42,8/42,4/42,2/42},
+                            {1/42,2/42,4/42,2/42,1/42}};
 };

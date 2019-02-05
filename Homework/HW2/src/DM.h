@@ -9,7 +9,7 @@
  *                               (4*I_n(i,j)+3, 4*I_n(i,j))]
  * The index matrix can then be transformed into a threshold matrix T for an input gray-level image with
  * normalized pixel values (i.e. with its dynamic range between 0 and 255) by the following formula:
- *              T(x,y) = (I(x,y)+0.5)/N^2/*255
+ *              T(x,y) = (I(x,y)+0.5)/N^2*255
  * where N 6 denotes the number of pixels in the matrix
  * if 0 ≤ F i, j ≤ T(i modN, j modN) -> G(i,j) = 0
  * if T(i modN, j modN) < F i, j < 256 -> G(i,j) = 255
@@ -70,7 +70,7 @@ public:
                 }
             }
         }
-        else if(indexNumber = 32){
+        else if(indexNumber == 32){
             for(int i = 0; i < imageHeight; i++){
                 for(int j = 0; j < imageWidth; j++){
                     if((double)input2DImage[i][j] <= (indexMatrix_32[i%32][j%32]+0.5)/32/32*255){
