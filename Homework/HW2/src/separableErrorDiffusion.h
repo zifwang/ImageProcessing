@@ -29,7 +29,7 @@ public:
                     *                Row: 0, Col: 1, Color: 1 <- fifth element
                     *                Row: 0, Col: 1, Color: 2 <- sixth element
                     */
-                    tmpImage[i][j][color] = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]);
+                    tmpImage[i][j][color] = 1 - double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color])/255;
                 }
             }
         }
@@ -42,12 +42,12 @@ public:
                     for(int j = 0; j < imageWidth; j++){
                         // compare to the threshold
                         if(tmpImage[i][j][color] >= threshold){
-                            error = tmpImage[i][j][color] - 255;
-                            imageOut[i][j][color] = (unsigned char) 255;
+                            error = tmpImage[i][j][color] - 1;
+                            imageOut[i][j][color] = (unsigned char) 0;
                         }
                         else{
                             error = tmpImage[i][j][color] - 0;
-                            imageOut[i][j][color] = (unsigned char) 0;
+                            imageOut[i][j][color] = (unsigned char) 255;
                         }
                         // error dist.
                         if (j < imageWidth-1) tmpImage[i][j+1][color] = tmpImage[i][j+1][color] + error*7.0/16;
@@ -60,12 +60,12 @@ public:
                     for(int j = imageWidth-1; j >= 0; j--){
                         // compare to the threshold
                         if(tmpImage[i][j][color] >= threshold){
-                            error = tmpImage[i][j][color] - 255;
-                            imageOut[i][j][color] = (unsigned char) 255;
+                            error = tmpImage[i][j][color] - 1;
+                            imageOut[i][j][color] = (unsigned char) 0;
                         }
                         else{
                             error = tmpImage[i][j][color] - 0;
-                            imageOut[i][j][color] = (unsigned char) 0;
+                            imageOut[i][j][color] = (unsigned char) 255;
                         }
                         // error dist.
                         if(j > 0) tmpImage[i][j-1][color] = tmpImage[i][j-1][color] + error*7/16;
@@ -76,7 +76,7 @@ public:
                 }
             }
         }
-        
+
         // set outputBuffer
         for(int i = 0; i < imageHeight; i++){
             for(int j = 0; j < imageWidth; j++){
@@ -89,5 +89,5 @@ public:
     }
 
 private:
-    double threshold = 127;             // Error diffusion threshold
+    double threshold = 0.5;             // Error diffusion threshold
 };
