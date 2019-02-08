@@ -5,9 +5,10 @@
 #include "flags.h"
 #include "image.h"
 #include "RT.h"
-#include "DM.h"
-#include "errorDiffusion.h"
+// #include "DM.h"
+// #include "errorDiffusion.h"
 #include "separableErrorDiffusion.h"
+#include "MBVQ.h"
 
 using namespace std;
 
@@ -38,10 +39,17 @@ int main(int argc, char** argv){
     // imageData.writeImage();
 
     // put into separable error diffusion method
-    separableErrorDiffusion sedImage;
-    sedImage.init_image(imageData);
-    sedImage.methodSeparableErrorDiffusion();
-    imageData.setOutputImage(sedImage.output(),sedImage.getImageSize());
+    // separableErrorDiffusion sedImage;
+    // sedImage.init_image(imageData);
+    // sedImage.methodSeparableErrorDiffusion();
+    // imageData.setOutputImage(sedImage.output(),sedImage.getImageSize());
+    // imageData.writeImage();
+
+    // put into MBVQ method
+    MBVQ mbvqImage;
+    mbvqImage.init_image(imageData);
+    mbvqImage.methodMVQB();
+    imageData.setOutputImage(mbvqImage.output(),mbvqImage.getImageSize());
     imageData.writeImage();
 
     return 0;

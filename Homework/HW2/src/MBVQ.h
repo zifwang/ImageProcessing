@@ -13,15 +13,15 @@ using namespace std;
 class MBVQ : public half_tonning_algorithm{
 public:
     void methodMVQB(){
-        unsigned char imageOut[imageHeight][imageWidth][BytesPerPixel];
-
-        double tmpMBVQImage[imageHeight][imageWidth][BytesPerPixel];
-        double tmpVertexImage[imageHeight][imageWidth][BytesPerPixel];
         double tmpImage[imageHeight][imageWidth][BytesPerPixel];
+        double* error = new double[imageSize];
+        unsigned char imageOut[imageHeight][imageWidth][BytesPerPixel];   
+
         // set all tmp images.
         for(int i = 0; i < imageHeight; i++){
             for(int j = 0; j < imageWidth; j++){
                 for(int color = 0; color < BytesPerPixel; color++){
+                    // cout << i << " " << j << " "<< color << " : ";
                     /**
                     * Read image by oneD array: first by row, then col, last color
                     * in the format: Row: 0, Col: 0, Color: 0 <- first element in 1D array
@@ -31,18 +31,114 @@ public:
                     *                Row: 0, Col: 1, Color: 1 <- fifth element
                     *                Row: 0, Col: 1, Color: 2 <- sixth element
                     */
-                    tmpMBVQImage[i][j][color] = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]);
-                    tmpVertexImage[i][j][color] = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color])/255;
-                    tmpImage[i][j][color] = 1 - double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color])/255;
+                    tmpImage[i][j][color] = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color])/255;
+                    error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color] = 0.0;
+                }
+            }
+        }
+
+        for(int i = 0; i < imageHeight; i++){
+            if(i%2 == 0){
+                for(int j = 0; j < imageWidth; j++){
+                    cout << i << "," << j << endl;
+                    // Get rgb value by tmpImage + error
+                    // double r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
+                    // double g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]; 
+                    // double b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
+                    // double r = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0]);
+                    // double g = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]);
+                    // double b = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2]);
+                    double r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
+                    double g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]; 
+                    double b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
+                    // cout << r << g << b;
+                    // determine the mbvq in image (i,j) based on image(i,j)
+                    string mbvq = whichMBVQ(r,g,b);
+                    cout << mbvq<< endl;
+                    // r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
+                    // g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]; 
+                    // b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
+                    // determine the closet vertex based on image(i,j) + error, and mbvq
+                    string vertex = whichVertex(mbvq,r,g,b);
+                    cout << vertex << endl;
+                    // determine the closet color by vertex
+                    int* determinedColor = whichColor(vertex);
+                    for(int color = 0; color < BytesPerPixel; color++){
+                        // set color to the ouput image
+                        if(determinedColor[color] == 0) imageOut[i][j][color] = (unsigned char) 0;
+                        if(determinedColor[color] == 1) imageOut[i][j][color] = (unsigned char) 255;
+                        // compute the error
+                        error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color] = tmpImage[i][j][color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color] - determinedColor[color];
+                        // error[i][j][color] = tmpImage[i][j][color] + error[i][j][color] - determinedColor[color];
+                        // // Distribute error to nearby location based on steinberg algorithm
+                        if(j+1 < imageWidth){
+                            error[i*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] = error[i*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*7/16;
+                        }
+                        if(j-1 >= 0 && i+1 < imageHeight){
+                            error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*3/16;
+                        }
+                        if(i+1 < imageHeight){
+                            error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*5/16;
+                        } 
+                        if(i+1 < imageHeight && j+1 < imageWidth){
+                            error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*1/16;
+                        }
+                    }
+                }
+            }
+            else{
+                for(int j = imageWidth-1; j >= 0; j--){
+                    cout << i << ", "<< j << endl;
+                    // Get rgb value by tmpImage + error
+                    // double r = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0]);
+                    // double g = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]);
+                    // double b = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2]);
+
+                    double r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
+                    double g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]; 
+                    double b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
+                    // determine the mbvq in image (i,j) based on image(i,j) + error
+                    string mbvq = whichMBVQ(r,g,b);
+                    cout << mbvq<< endl;
+                    // determine the closet vertex based on image(i,j) + error, and mbvq
+                    
+                    string vertex = whichVertex(mbvq,r,g,b);
+                    cout << vertex << endl;
+                    // determine the closet color by vertex
+                    int* determinedColor = whichColor(vertex);
+                    for(int color = 0; color < BytesPerPixel; color++){
+                        // set color to the ouput image
+                        if(determinedColor[color] == 1) imageOut[i][j][color] = (unsigned char) 255;
+                        if(determinedColor[color] == 0) imageOut[i][j][color] = (unsigned char) 0;
+                        // compute the error
+                        error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color] = tmpImage[i][j][color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color] - determinedColor[color];
+                        // Distribute error to nearby location based on steinberg algorithm
+                        if(j > 0){
+                            error[i*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] = error[i*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*7/16;
+                        }
+                        if(j > 0 && i+1 < imageHeight){
+                            error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*1/16;
+                        } 
+                        if(i+1 < imageHeight){
+                            error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*5/16;
+                        }
+                        if(j < imageWidth-1 && i+1 < imageHeight){
+                            error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*3/16;
+                        } 
+                    }
                 }
             }
         }
 
 
-
-
-
-
+        // set outputBuffer
+        for(int i = 0; i < imageHeight; i++){
+            for(int j = 0; j < imageWidth; j++){
+                for(int color = 0; color < BytesPerPixel; color++){
+                    outputBuffer[i*BytesPerPixel*imageWidth+j*BytesPerPixel+color] = imageOut[i][j][color];
+                }
+            }
+        }
     }
 
 private:
@@ -72,22 +168,22 @@ private:
         if(mbvq == "CMYW"){
             vertex = "white";
             if(blue < 0.5){
-                if(blue <= red){
-                    if(blue <= green){
+                if(blue < red){
+                    if(blue < green){
                         vertex = "yellow";
                     }
                 }
             }
             if(green < 0.5){
-                if(green <= blue){
-                    if(green <= red){
+                if(green < blue){
+                    if(green < red){
                         vertex = "magenta";
                     }
                 }
             }
             if(red < 0.5){
-                if(red <= blue){
-                    if(red <= green){
+                if(red < blue){
+                    if(red < green){
                         vertex = "cyan";
                     }
                 }
@@ -96,18 +192,18 @@ private:
         // 2.MYGC
         else if(mbvq == "MYGC"){
             vertex = "magenta";
-            if(green >= blue){
-                if(red >= blue){
-                    if(red >= 0.5){
+            if(green > blue){
+                if(red > blue){
+                    if(red > 0.5){
                         vertex = "yellow";
                     }else{
                         vertex = "green";
                     }
                 }
             }
-            if(green >= red){
-                if(blue >= red){
-                    if(blue >= 0.5){
+            if(green > red){
+                if(blue > red){
+                    if(blue > 0.5){
                         vertex = "cyan";
                     }else{
                         vertex = "green";
@@ -119,7 +215,7 @@ private:
         else if(mbvq == "RGMY"){
             if(blue > 0.5){
                 if(red > 0.5){
-                    if(blue >= green){
+                    if(blue > green){
                         vertex = "magenta";
                     }else{
                         vertex = "yellow";
@@ -132,14 +228,14 @@ private:
                     }
                 }
             }else{
-                if(red >= 0.5){
-                    if(green >= 0.5){
+                if(red > 0.5){
+                    if(green > 0.5){
                         vertex = "yellow";
                     }else{
                         vertex = "red";
                     }
                 }else{
-                    if(red >= green){
+                    if(red > green){
                         vertex = "red";
                     }else{
                         vertex = "green";
@@ -151,22 +247,22 @@ private:
         else if(mbvq == "KRGB"){
             vertex = "black";
             if(blue > 0.5){
-                if(blue >= red){
-                    if(blue >= green){
+                if(blue > red){
+                    if(blue > green){
                         vertex = "blue";
                     }
                 }
             }
             if(green > 0.5){
-                if(green >= blue){
+                if(green > blue){
                     if(green >= red){
                         vertex = "green";
                     }
                 }
             }
             if(red > 0.5){
-                if(red >= blue){
-                    if(red >= green){
+                if(red > blue){
+                    if(red > green){
                         vertex = "red";
                     }
                 }
@@ -176,7 +272,7 @@ private:
         else if(mbvq == "RGBM"){
             vertex = "green";
             if(red > green){
-                if(red >= blue){
+                if(red > blue){
                     if(blue < 0.5){
                         vertex = "red";
                     }else{
@@ -185,7 +281,7 @@ private:
                 }
             }
             if(blue > green){
-                if(blue >= red){
+                if(blue > red){
                     if(red < 0.5){
                         vertex = "blue";
                     }else{
@@ -198,7 +294,7 @@ private:
         else if(mbvq == "CMGB"){
             if(blue > 0.5){
                 if(red > 0.5){
-                    if(green >= red){
+                    if(green > red){
                         vertex = "cyan";
                     }else{
                         vertex = "magenta";
@@ -212,13 +308,13 @@ private:
                 }
             }else{
                 if(red > 0.5){
-                    if(red - green + blue >= 0.5){
+                    if(red - green + blue > 0.5){
                         vertex = "magenta";
                     }else{
                         vertex = "green";
                     }
                 }else{
-                    if(green >= blue){
+                    if(green > blue){
                         vertex = "green";
                     }else{
                         vertex = "blue";
@@ -229,24 +325,50 @@ private:
         return vertex;
     }
 
+    // Define color;
+    int* whichColor(string vertex){
+        static int color[3];
+        if(vertex == "white"){
+            color[0] = 1;
+            color[1] = 1;
+            color[2] = 1;
+        }
+        if(vertex == "black"){
+            color[0] = 0;
+            color[1] = 0;
+            color[2] = 0;
+        }
+        if(vertex == "yellow"){
+            color[0] = 1;
+            color[1] = 1;
+            color[2] = 0;
+        }
+        if(vertex == "cyan"){
+            color[0] = 0;
+            color[1] = 1;
+            color[2] = 1;
+        }
+        if(vertex == "magenta"){
+            color[0] = 1;
+            color[1] = 0;
+            color[2] = 1;
+        }
+        if(vertex == "green"){
+            color[0] = 0;
+            color[1] = 1;
+            color[2] = 0;
+        }
+        if(vertex == "red"){
+            color[0] = 1;
+            color[1] = 0;
+            color[2] = 0;
+        }
+        if(vertex == "blue"){
+            color[0] = 0;
+            color[1] = 0;
+            color[2] = 1;
+        }
+        return color;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-}
+};

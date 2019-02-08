@@ -18,9 +18,9 @@ public:
         BytesPerPixel = inputImage.getBytesPerPixel();
         imageSize = imageHeight*imageWidth*BytesPerPixel;
         inputBuffer = inputImage.getInputImage();
-        if(BytesPerPixel == 1){
-            input2DImage = oneDTOtwoD(inputBuffer,imageHeight,imageWidth);
-        }
+        // if(BytesPerPixel == 1){
+        //     input2DImage = oneDTOtwoD(inputBuffer,imageHeight,imageWidth);
+        // }
         // allocate memory to contain the whole file:
         outputBuffer = (unsigned char*) malloc (sizeof(unsigned char)*imageSize);
         if (outputBuffer == NULL) {
@@ -50,20 +50,30 @@ public:
         return imageSize;
     }
 
+    /**
+     * Return image Height(int type) and width
+     */
+    int getImageHeight(){
+        return imageHeight;
+    }
+    int getImageWidth(){
+        return imageWidth;
+    }
+
 protected:
     int imageHeight;                    // Height of input image
     int imageWidth;                     // Width of input image
     int BytesPerPixel;                  // number of color channels
     long imageSize;                     // input image Size
     unsigned char *inputBuffer;         // Input image
-    unsigned char** input2DImage;       // Input 2D image
+    // unsigned char** input2DImage;       // Input 2D image
     unsigned char *outputBuffer;        // Output image
 
     /**
      * Function to calculate 2D image(only for gray-scale)
     */ 
     unsigned char** oneDTOtwoD(unsigned char* inputImage, int height, int width){
-        unsigned char** outputImage;
+        static unsigned char** outputImage;
         outputImage = new unsigned char*[height];
         for(int i = 0; i < height; i++){
             outputImage[i] = new unsigned char[width];
