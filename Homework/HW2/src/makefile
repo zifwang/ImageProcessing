@@ -7,7 +7,7 @@ CC = g++
 CFLAGS=-c -g -std=c++11
 SOURCES=main.cpp flags.cpp image.cpp sobelEdgeDetector.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
-LIBS=
+LIBS=`pkg-config --libs opencv`
 LDFLAGS=
 PROGRAM=HW2
 
