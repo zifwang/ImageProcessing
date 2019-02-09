@@ -5,11 +5,11 @@
 #   make clean
 CC = g++
 CFLAGS=-c -g -std=c++11
-SOURCES=main.cpp flags.cpp image.cpp 
+SOURCES=main.cpp flags.cpp image.cpp sobelEdgeDetector.cpp
 OBJECTS=$(SOURCES:.cpp=.o)
 LIBS=
 LDFLAGS=
-PROGRAM=problem2
+PROGRAM=HW2
 
 all: $(PROGRAM)
 

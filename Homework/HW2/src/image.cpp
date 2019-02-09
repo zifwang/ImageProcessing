@@ -49,14 +49,14 @@ void image::readImage(){
     fclose(file);
 }
 
-void image::writeImage(){
+void image::writeImage(long ouputImageSize){
     FILE *file; 
     file = fopen(outputFilename.c_str(),"wb");
     if(file == NULL){
         cout << "Error opening file: " << outputFilename.c_str() << endl;
         exit(EXIT_FAILURE);
     }else{
-        fwrite(outputBuffer, sizeof(unsigned char), imageHeight*imageWidth*BytesPerPixel, file);
+        fwrite(outputBuffer, sizeof(unsigned char), ouputImageSize, file);
     }
     fclose(file);
 }

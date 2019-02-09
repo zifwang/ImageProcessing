@@ -32,7 +32,7 @@ public:
     /**
      * Write to file
      */ 
-    void writeImage();
+    void writeImage(long ouputImageSize);
 
     /**
      * Return 1-D array of input image

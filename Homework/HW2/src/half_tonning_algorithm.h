@@ -18,9 +18,9 @@ public:
         BytesPerPixel = inputImage.getBytesPerPixel();
         imageSize = imageHeight*imageWidth*BytesPerPixel;
         inputBuffer = inputImage.getInputImage();
-        // if(BytesPerPixel == 1){
-        //     input2DImage = oneDTOtwoD(inputBuffer,imageHeight,imageWidth);
-        // }
+        if(BytesPerPixel == 1){
+            input2DImage = oneDTOtwoD(inputBuffer,imageHeight,imageWidth);
+        }
         // allocate memory to contain the whole file:
         outputBuffer = (unsigned char*) malloc (sizeof(unsigned char)*imageSize);
         if (outputBuffer == NULL) {
@@ -66,7 +66,7 @@ protected:
     int BytesPerPixel;                  // number of color channels
     long imageSize;                     // input image Size
     unsigned char *inputBuffer;         // Input image
-    // unsigned char** input2DImage;       // Input 2D image
+    unsigned char** input2DImage;       // Input 2D image
     unsigned char *outputBuffer;        // Output image
 
     /**
