@@ -15,6 +15,7 @@
 #include <cstdlib>
 #include <chrono>
 #include <random>
+#include <stdlib.h>
 #include "half_tonning_algorithm.h"
 #include "image.h"
 
@@ -45,11 +46,14 @@ public:
         long imageSize = imageHeight*imageWidth*BytesPerPixel;
 
         for(int i = 0; i < imageSize; i++){
+            int numRandom = distribution(generator);
+            // int numRandom = rand()%256;
+
             // Loop through the inputimage array which is 1-D
-            if(inputBuffer[i] >= 0 && inputBuffer[i] < distribution(generator)){
+            if(inputBuffer[i] >= 0 && inputBuffer[i] < numRandom){
                 outputBuffer[i] = (unsigned char)0;
             }
-            else if(inputBuffer[i] <= 255 && inputBuffer[i] >= distribution(generator)){
+            else if(inputBuffer[i] <= 255 && inputBuffer[i] >= numRandom){
                 outputBuffer[i] = (unsigned char)255;
             }
         }
