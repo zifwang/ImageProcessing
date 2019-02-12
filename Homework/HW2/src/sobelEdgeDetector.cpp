@@ -131,13 +131,17 @@ void sobelEdgeDetector::methodSobelEdgeDetector(){
     for(int i = 0; i < imageHeight; i++){
         for(int j = 0; j < imageWidth; j++){
             gradiantMap[i][j] = 255*(gradiantMap[i][j]-minGD)/(maxGD-minGD);
+            // gxImage[i][j] = 255 * (gxImage[i][j]-minX)/(maxX-minX);
+            // gyImage[i][j] = 255 * (gyImage[i][j]-minY)/(maxY-minY);
         }
     }
+
+
 
     // Apply thresholding 
     int height[imageHeight*imageWidth];   // first row height, second row width
     int width[imageHeight*imageWidth]; 
-    double threshold = 0.075;
+    double threshold = 0.05;
     int boundary = int((1-threshold)*imageHeight*imageWidth);
     // cout << boundary << endl;
     int position = 0;
@@ -187,17 +191,17 @@ unsigned char* sobelEdgeDetector::output(){
 }
 
 /**
-* Return gray image size(long type)
+* Return image size(long type)
 */
 long sobelEdgeDetector::getImageSize(){
-    return imageHeight*imageWidth;
+    return imageHeight*imageWidth*BytesPerPixel;
 }
 
 /**
-* Return image size(long type)
+* Return gray image size(long type)
 */
 long sobelEdgeDetector::getGrayImageSize(){
-    return imageSize;
+    return imageHeight*imageWidth;
 }
 
 /**

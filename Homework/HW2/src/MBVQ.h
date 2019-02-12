@@ -40,102 +40,95 @@ public:
         for(int i = 0; i < imageHeight; i++){
             if(i%2 == 0){
                 for(int j = 0; j < imageWidth; j++){
-                    cout << i << "," << j << endl;
                     // Get rgb value by tmpImage + error
-                    // double r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
-                    // double g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]; 
-                    // double b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
-                    // double r = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0]);
-                    // double g = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]);
-                    // double b = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2]);
-                    double r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
-                    double g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]; 
-                    double b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
-                    // cout << r << g << b;
+                    double r = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0]);
+                    double g = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]);
+                    double b = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2]);
+    
                     // determine the mbvq in image (i,j) based on image(i,j)
                     string mbvq = whichMBVQ(r,g,b);
-                    cout << mbvq<< endl;
-                    // r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
-                    // g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]; 
-                    // b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
+                    
+                    r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
+                    g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1];
+                    b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
+
                     // determine the closet vertex based on image(i,j) + error, and mbvq
                     string vertex = whichVertex(mbvq,r,g,b);
-                    cout << vertex << endl;
                     // determine the closet color by vertex
                     int* determinedColor = whichColor(vertex);
+
                     for(int color = 0; color < BytesPerPixel; color++){
                         // set color to the ouput image
-                        if(determinedColor[color] == 0) imageOut[i][j][color] = (unsigned char) 0;
-                        if(determinedColor[color] == 1) imageOut[i][j][color] = (unsigned char) 255;
+                        imageOut[i][j][color] = (unsigned char) determinedColor[color];
                         // compute the error
                         error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color] = tmpImage[i][j][color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color] - determinedColor[color];
                         // error[i][j][color] = tmpImage[i][j][color] + error[i][j][color] - determinedColor[color];
                         // // Distribute error to nearby location based on steinberg algorithm
                         if(j+1 < imageWidth){
-                            error[i*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] = error[i*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*7/16;
+                            error[i*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] += error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*7/16;
                         }
                         if(j-1 >= 0 && i+1 < imageHeight){
-                            error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*3/16;
+                            error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] += error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*3/16;
                         }
                         if(i+1 < imageHeight){
-                            error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*5/16;
+                            error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] += error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*5/16;
                         } 
                         if(i+1 < imageHeight && j+1 < imageWidth){
-                            error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*1/16;
+                            error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] += error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*1/16;
                         }
                     }
                 }
             }
             else{
                 for(int j = imageWidth-1; j >= 0; j--){
-                    cout << i << ", "<< j << endl;
                     // Get rgb value by tmpImage + error
-                    // double r = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0]);
-                    // double g = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]);
-                    // double b = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2]);
+                    double r = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0]);
+                    double g = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]);
+                    double b = double(inputBuffer[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2]);
 
-                    double r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
-                    double g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1]; 
-                    double b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
                     // determine the mbvq in image (i,j) based on image(i,j) + error
                     string mbvq = whichMBVQ(r,g,b);
-                    cout << mbvq<< endl;
-                    // determine the closet vertex based on image(i,j) + error, and mbvq
                     
+                    // determine the closet vertex based on image(i,j) + error, and mbvq
+                    r = tmpImage[i][j][0] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+0];
+                    g = tmpImage[i][j][1] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+1];
+                    b = tmpImage[i][j][2] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+2];
+
+                    // determine the closet vertex based on image(i,j) + error, and mbvq
                     string vertex = whichVertex(mbvq,r,g,b);
-                    cout << vertex << endl;
+
                     // determine the closet color by vertex
                     int* determinedColor = whichColor(vertex);
+
                     for(int color = 0; color < BytesPerPixel; color++){
                         // set color to the ouput image
-                        if(determinedColor[color] == 1) imageOut[i][j][color] = (unsigned char) 255;
-                        if(determinedColor[color] == 0) imageOut[i][j][color] = (unsigned char) 0;
+                        imageOut[i][j][color] = (unsigned char) determinedColor[color];
                         // compute the error
                         error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color] = tmpImage[i][j][color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color] - determinedColor[color];
                         // Distribute error to nearby location based on steinberg algorithm
                         if(j > 0){
-                            error[i*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] = error[i*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*7/16;
+                            error[i*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] += error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*7/16;
                         }
                         if(j > 0 && i+1 < imageHeight){
-                            error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*1/16;
+                            error[(i+1)*imageWidth*BytesPerPixel+(j-1)*BytesPerPixel+color] += error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*1/16;
                         } 
                         if(i+1 < imageHeight){
-                            error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*5/16;
+                            error[(i+1)*imageWidth*BytesPerPixel+(j)*BytesPerPixel+color] += error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*5/16;
                         }
                         if(j < imageWidth-1 && i+1 < imageHeight){
-                            error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] = error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] + error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*3/16;
+                            error[(i+1)*imageWidth*BytesPerPixel+(j+1)*BytesPerPixel+color] += error[i*imageWidth*BytesPerPixel+j*BytesPerPixel+color]*3/16;
                         } 
                     }
                 }
             }
         }
 
-
+        
         // set outputBuffer
         for(int i = 0; i < imageHeight; i++){
             for(int j = 0; j < imageWidth; j++){
                 for(int color = 0; color < BytesPerPixel; color++){
-                    outputBuffer[i*BytesPerPixel*imageWidth+j*BytesPerPixel+color] = imageOut[i][j][color];
+                    outputBuffer[i*BytesPerPixel*imageWidth+j*BytesPerPixel+color] = (unsigned char) double(imageOut[i][j][color])*255;
                 }
             }
         }
@@ -325,7 +318,51 @@ private:
         return vertex;
     }
 
-    // Define color;
+    // // Define color;
+    // int* whichColor(string vertex){
+    //     static int color[3];
+    //     if(vertex == "white"){
+    //         color[0] = 0;
+    //         color[1] = 0;
+    //         color[2] = 0;
+    //     }
+    //     if(vertex == "black"){
+    //         color[0] = 1;
+    //         color[1] = 1;
+    //         color[2] = 1;
+    //     }
+    //     if(vertex == "yellow"){
+    //         color[0] = 0;
+    //         color[1] = 0;
+    //         color[2] = 1;
+    //     }
+    //     if(vertex == "cyan"){
+    //         color[0] = 1;
+    //         color[1] = 0;
+    //         color[2] = 0;
+    //     }
+    //     if(vertex == "magenta"){
+    //         color[0] = 0;
+    //         color[1] = 1;
+    //         color[2] = 0;
+    //     }
+    //     if(vertex == "green"){
+    //         color[0] = 1;
+    //         color[1] = 0;
+    //         color[2] = 1;
+    //     }
+    //     if(vertex == "red"){
+    //         color[0] = 0;
+    //         color[1] = 1;
+    //         color[2] = 1;
+    //     }
+    //     if(vertex == "blue"){
+    //         color[0] = 1;
+    //         color[1] = 1;
+    //         color[2] = 0;
+    //     }
+    //     return color;
+    // }
     int* whichColor(string vertex){
         static int color[3];
         if(vertex == "white"){
@@ -370,5 +407,4 @@ private:
         }
         return color;
     }
-
 };
