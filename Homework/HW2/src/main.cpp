@@ -117,7 +117,7 @@ void cannyEdgeDetection(FlagOptions flags){
     // Define output image
     cv::Mat outputImage;
     // Apply Canny edge detection
-    cv::Canny(grayOriImage,outputImage,450,475,3);
+    cv::Canny(grayOriImage,outputImage,0.3,0.6,3);
     // write to image
     cv::imwrite(flags.outputFilename,outputImage);
     cv::waitKey();
