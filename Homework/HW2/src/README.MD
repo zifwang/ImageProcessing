@@ -9,6 +9,7 @@ Lauguage: c++
 Complier: g++
 OS must have openCV lib.
 
+The makefile is used to run the code
 After type make in terminal. type ./HW2 help to know detail of Runing code
 Problem 1:
     A. Sobel Edge Detector:
