@@ -90,7 +90,7 @@ int main(int argc, char** argv){
         imageData.setOutputImage(mbvqImage.output(),mbvqImage.getImageSize());
         imageData.writeImage(mbvqImage.getImageSize());
     }
-    else if(flags.algorithm == "Sobel"){
+    else if(flags.algorithm == "SOBEL"){
         // Init. input image data
         image imageData = image(flags);
         // put into sobel edge detector method
@@ -102,7 +102,10 @@ int main(int argc, char** argv){
     else if(flags.algorithm == "CANNY"){
         cannyEdgeDetection(flags);
     }
-
+    else{
+        cout << "Error: the input algorithm is not found." << endl;
+        exit(EXIT_FAILURE);
+    }
 
     return 0;
 }
