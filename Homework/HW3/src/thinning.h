@@ -1,9 +1,3 @@
-// Author: Zifan Wang
-/**
- * Implement the shrinking algorithm.
- * 
- * 
-*/
 
 #pragma once 
 
@@ -15,9 +9,9 @@
 
 using namespace std;
 
-class shrinking : public morphology{
+class thinning : public morphology{
 public:
-    void methodShrinking(){
+    void methodThinning(){
         // Declare a tmpImage pointer 
         int* tmpImage = new int[imageSize_gray];
         // The following code set tmpImage values from [0,1] based on threshold 127 and inputBuffer
@@ -110,9 +104,9 @@ public:
                             for(int m1 = 0; m1 < 58; m1++){
                                 // if((i > 80 && i < 295) && (j>80 && j < 295)){
                                 //     cout << " tmpString: "<<tmpString << endl;
-                                //     cout << "shrinkMark: " << shrinkMark[m1] << endl;
+                                //     cout << "thinMark: " << thinMark[m1] << endl;
                                 // }
-                                if(tmpString == shrinkMark[m1]){
+                                if(tmpString == thinMark[m1]){
                                     hit_1++;
                                 }
                             }
@@ -157,7 +151,7 @@ public:
                             }
                         }
                         for(int m2 = 0; m2 < 364; m2++){
-                            if(stage2String == shrinkUncondMark[m2]){
+                            if(stage2String == thinUncondMark[m2]){
                                 hit_2++;
                             }
                         }
@@ -213,12 +207,8 @@ private:
     
 
     // Conditional Mark Logic
-    string shrinkMark[58] = { // S-Bound1: 4
-                              "001010000","100010000","000010100","000010001",
-                              // S-Bound2: 4
-                              "000011000","010010000","000110000","000010010",
-                              // S-Bound3: 8
-                              "001011000","011010000","110010000","100110000","000110100","000010110","000010011","000011001",
+    string thinMark[46] = {   // TK-Bound4: 4:
+                              "010011000","010110000","000110010","000011010",
                               // STK-Bound4: 4
                               "001011001","111010000","100110100","000010111",
                               // ST-Bound5: 4
@@ -240,7 +230,7 @@ private:
                             };
 
     // Unconditional Mark Logic
-    string shrinkUncondMark[364] =  { // Spur: 2
+    string thinUncondMark[364] =  { // Spur: 2
                                       "001010000","100010000",
                                       // Single 4-connection: 2
                                       "000010010","000011000",

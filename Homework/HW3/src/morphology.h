@@ -74,4 +74,4 @@ protected:
     long imageSize_gray;                // gray scale input image Size
     unsigned char *inputBuffer;         // Input image
     unsigned char *outputBuffer;        // Output image
-}
+};
