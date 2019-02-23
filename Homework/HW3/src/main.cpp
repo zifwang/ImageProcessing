@@ -6,6 +6,7 @@
 #include "image.h"
 #include "shrinking.h"
 #include "thinning.h"
+#include "skeletonizing.h"
 
 using namespace std;
 
@@ -18,12 +19,16 @@ int main(int argc, char** argv){
     // shrinkImg.methodShrinking();
     // imageData.setOutputImage(shrinkImg.output(),shrinkImg.getImageSize_gray()); 
     // imageData.writeImage(shrinkImg.getImageSize_gray());
-    thinning thinImg;
-    thinImg.init_image(imageData);
-    thinImg.methodThinning();
-    imageData.setOutputImage(thinImg.output(),thinImg.getImageSize_gray()); 
-    imageData.writeImage(thinImg.getImageSize_gray());    
-    
+    // thinning thinImg;
+    // thinImg.init_image(imageData);
+    // thinImg.methodThinning();
+    // imageData.setOutputImage(thinImg.output(),thinImg.getImageSize_gray()); 
+    // imageData.writeImage(thinImg.getImageSize_gray());    
+    skeletonzing sktImg;
+    sktImg.init_image(imageData);
+    sktImg.methodSkeletonzing();
+    imageData.setOutputImage(sktImg.output(),sktImg.getImageSize_gray()); 
+    imageData.writeImage(sktImg.getImageSize_gray());   
 
     
     // else{

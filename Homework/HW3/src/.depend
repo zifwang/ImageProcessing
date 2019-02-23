@@ -1,3 +1,4 @@
-main.o: main.cpp flags.h image.h shrinking.h morphology.h thinning.h
+main.o: main.cpp flags.h image.h shrinking.h morphology.h thinning.h \
+ skeletonizing.h
 flags.o: flags.cpp flags.h
 image.o: image.cpp image.h flags.h
