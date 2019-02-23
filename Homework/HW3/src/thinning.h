@@ -13,31 +13,7 @@ class thinning : public morphology{
 public:
     void methodThinning(){
         // Declare a tmpImage pointer 
-        int* tmpImage = new int[imageSize_gray];
-        // The following code set tmpImage values from [0,1] based on threshold 127 and inputBuffer
-        if(BytesPerPixel == 1){        
-            for(int i = 0; i < imageSize_gray; i++){
-                if(int(inputBuffer[i]) > 127){
-                    tmpImage[i] = 1;
-                }
-                else{
-                    tmpImage[i] = 0;
-                }
-           }
-        }
-        else{
-            unsigned char* grayImage = new unsigned char[imageSize_gray];    // Declare a return image
-            grayImage = rgb2gray(inputBuffer,imageHeight,imageWidth,BytesPerPixel);
-            for(int i = 0; i < imageSize_gray; i++){
-                if(int(grayImage[i]) > 127){
-                    tmpImage[i] = 1;
-                }
-                else{
-                    tmpImage[i] = 0;
-                }
-            }
-            delete[] grayImage;
-        }
+        int* tmpImage = getOriImage();
 
         cout << "Finish normalize image" << endl;
         
@@ -365,25 +341,4 @@ private:
         "001110010",
         "100011010"
     };
-
-    unsigned char* rgb2gray(unsigned char *inputImage,int imageHeight, int imageWidth,int BytesPerPixel){
-        unsigned char* grayImage;    // Declare a return image
-        grayImage = (unsigned char*) malloc (sizeof(unsigned char)*imageHeight*imageWidth);
-
-        for(int i = 0; i < imageHeight; i++){
-            for(int j = 0; j < imageWidth; j++){
-                // rgb2gray converts RGB values to grayscale values by forming a weighted sum of the R, G, and B components:
-                // 0.2989 * R + 0.5870 * G + 0.1140 * B 
-                double tmp = 0.2989*double(inputImage[i*BytesPerPixel*imageWidth+j*BytesPerPixel+0])+
-                            0.5870*double(inputImage[i*BytesPerPixel*imageWidth+j*BytesPerPixel+1])+
-                            0.1140*double(inputImage[i*BytesPerPixel*imageWidth+j*BytesPerPixel+2]);
-                // cout << tmp << endl;
-                if(tmp > 255) grayImage[i*imageWidth+j] = (unsigned char) 255;
-                else if(tmp < 0) grayImage[i*imageWidth+j] = (unsigned char) 0;
-                else grayImage[i*imageWidth+j] = (unsigned char) tmp;
-            }
-        }
-        return grayImage;
-    }
-
 };
