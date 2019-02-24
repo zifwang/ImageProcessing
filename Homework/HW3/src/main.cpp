@@ -53,6 +53,13 @@ int main(int argc, char** argv){
         imageData.setOutputImage(defectImg.output(),defectImg.getImageSize_gray()); 
         imageData.writeImage(defectImg.getImageSize_gray());   
     }
+    else if(flags.algorithm == "ObjectAnalysis"){
+        objectAnalysis objImg;
+        objImg.init_image(imageData);
+        objImg.analysis();
+        imageData.setOutputImage(objImg.output(),objImg.getImageSize_gray()); 
+        imageData.writeImage(objImg.getImageSize_gray());   
+    }
     
 
 

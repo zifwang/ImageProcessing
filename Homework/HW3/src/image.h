@@ -24,6 +24,7 @@ public:
      */
     image();
 
+
     /**
      * Read in file
      */ 

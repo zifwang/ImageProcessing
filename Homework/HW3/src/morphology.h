@@ -75,7 +75,7 @@ public:
         // get size of stage one and stage two filter
         int lengthStageOne = lengthOne;
         int lengthStageTwo = lengthTwo;
-
+        isUpdate = true;
         while(isUpdate){
             iter++;
             // Stage One
@@ -174,6 +174,138 @@ public:
         return tmpImage;
     }
 
+    // main body hole filling 
+    int* holeFilling_gray(int* inputImage, int imageHeight, int imageWidth){
+        // pixels nearby
+        int X, X0, X1, X2, X3, X4, X5, X6, X7;
+
+        // Additive Operators:
+        // 1. Interior Fill  G(j,k) = X∪[X0 ∩ X2 ∩ X4 ∩ X6]
+        string interiorFill_5 = "11011";        // First detection
+        string interiorFill_9 = "111101111";
+
+        // image init.
+        int* tmpImage = new int[imageHeight*imageWidth];
+        tmpImage = inputImage;
+
+        // flag to see whether is completed
+        bool isCompleted = true;
+        while(isCompleted){
+            int count = 0;
+            for(int i = 1; i < imageHeight-1; i++){
+                for(int j = 1; j < imageWidth-1; j++){
+                    X = tmpImage[i*imageWidth+j];
+                    X0 = tmpImage[i*imageWidth+j+1];
+                    X1 = tmpImage[(i-1)*imageWidth+j+1];
+                    X2 = tmpImage[(i-1)*imageWidth+j];
+                    X3 = tmpImage[(i-1)*imageWidth+j-1];
+                    X4 = tmpImage[i*imageWidth+j-1];
+                    X5 = tmpImage[(i+1)*imageWidth+j-1];
+                    X6 = tmpImage[(i+1)*imageWidth+j];
+                    X7 = tmpImage[(i+1)*imageWidth+j+1];
+                    string tmpPattern = to_string(X2)+to_string(X4)+to_string(X)+to_string(X0)+to_string(X6);
+                    if(tmpPattern == interiorFill_5){
+                        tmpPattern = to_string(X3)+to_string(X2)+to_string(X1)+
+                                                to_string(X4)+to_string(X)+to_string(X0)+
+                                                to_string(X5)+to_string(X6)+to_string(X7);
+                        if(tmpPattern == interiorFill_9){
+                            tmpImage[i*imageWidth+j] = 1;
+                            count++;
+                        }
+                    }
+                }
+            }
+            if(count != 0) isCompleted = true;
+            else isCompleted = false;
+        }
+        return tmpImage;
+    }
+
+    // removing unnecessary point
+    int* removing_iso_pixel_gray(int* inputImage, int imageHeight, int imageWidth){
+        // pixels nearby
+        int X, X0, X1, X2, X3, X4, X5, X6, X7;
+
+        // Additive Operators:
+        // 1. Interior Fill  G(j,k) = X∪[X0 ∩ X2 ∩ X4 ∩ X6]
+        string outside_remove_5 = "00100";        // First detection
+
+        // image init.
+        int* tmpImage = new int[imageHeight*imageWidth];
+        tmpImage = inputImage;
+
+        // flag to see whether is completed
+        bool isCompleted = true;
+        while(isCompleted){
+            int count = 0;
+            for(int i = 1; i < imageHeight-1; i++){
+                for(int j = 1; j < imageWidth-1; j++){
+                    X = tmpImage[i*imageWidth+j];
+                    X0 = tmpImage[i*imageWidth+j+1];
+                    X1 = tmpImage[(i-1)*imageWidth+j+1];
+                    X2 = tmpImage[(i-1)*imageWidth+j];
+                    X3 = tmpImage[(i-1)*imageWidth+j-1];
+                    X4 = tmpImage[i*imageWidth+j-1];
+                    X5 = tmpImage[(i+1)*imageWidth+j-1];
+                    X6 = tmpImage[(i+1)*imageWidth+j];
+                    X7 = tmpImage[(i+1)*imageWidth+j+1];
+                    string tmpPattern = to_string(X2)+to_string(X4)+to_string(X)+to_string(X0)+to_string(X6);
+                    if(tmpPattern == outside_remove_5){
+                        tmpPattern = to_string(X3)+to_string(X2)+to_string(X1)+
+                                                to_string(X4)+to_string(X)+to_string(X0)+
+                                                to_string(X5)+to_string(X6)+to_string(X7);
+                        tmpImage[i*imageWidth+j] = 0;
+                        count++;
+                    }
+                }
+            }
+            if(count != 0) isCompleted = true;
+            else isCompleted = false;
+        }
+        return tmpImage;
+    }
+
+
+    // padding
+    unsigned char* padding(unsigned char* inputImage, int imageHeight, int imageWidth, int paddingSize){
+        unsigned char* imageTemp = new unsigned char[(imageHeight+paddingSize*2)*imageWidth];
+        unsigned char* imageExtend = new unsigned char[(imageHeight+paddingSize*2)*(imageWidth+paddingSize*2)];
+        // Extend height(row)
+        for(int h = 0; h < imageHeight+paddingSize*2; h++){
+            for(int w = 0; w < imageWidth; w++){
+                if(h < paddingSize){
+                    int actHeight = paddingSize - h - 1;
+                    imageTemp[h*imageWidth+w] = inputImage[actHeight*imageWidth+w];
+                }
+                else if(h > imageHeight+paddingSize-1){
+                    int actHeight = imageHeight - (h-imageHeight) + (paddingSize-1);
+                    imageTemp[h*imageWidth+w] = inputImage[actHeight*imageWidth+w];
+                }
+                else imageTemp[h*imageWidth+w] = inputImage[(h-paddingSize)*imageWidth+w];
+            }
+        }
+        // Extend width(col)
+        for(int w = 0; w < imageWidth+paddingSize*2; w++){
+            for(int h = 0; h < imageHeight+paddingSize*2; h++){
+                if(w < paddingSize){
+                    int actWidth = paddingSize - w - 1;
+                    imageExtend[h*(imageWidth+paddingSize*2)+w] = imageTemp[h*(imageWidth)+actWidth];
+                }
+                else if(w > imageWidth+paddingSize-1){
+                    int actWidth = imageWidth - (w-imageWidth) + (paddingSize-1);
+                    imageExtend[h*(imageWidth+paddingSize*2)+w]= imageTemp[h*(imageWidth)+actWidth];
+                }
+                else{
+                    imageExtend[h*(imageWidth+paddingSize*2)+w]= imageTemp[h*(imageWidth)+(w-paddingSize)];
+                }
+            }
+        }
+        delete[] imageTemp;
+        return imageExtend;
+}
+
+
+
     /**
      * Set output Image
      */
@@ -183,8 +315,6 @@ public:
             outputBuffer[i] = (unsigned char) tmpImage[i]*255;
         }
     }
-
-
 
     /**
      * Get input image

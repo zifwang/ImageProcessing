@@ -21,7 +21,7 @@ class defectDetect : public morphology{
 public:
     void detection(){
         // Declare a tmpImage pointer 
-        int* tmpImage = getOriImage();
+        int* tmpImage = getOriImage_0_1();
 
         // Find defects
         for(int i = 1; i < imageHeight-1; i++){
@@ -63,7 +63,7 @@ public:
     }
 
     void fixMainBodyDefect(){
-        int* tmpImage = getOriImage();
+        int* tmpImage = getOriImage_0_1();
         for(int i = 0; i < mainBodyDefects.size(); i++){
             coordinate = mainBodyDefects[i];
             tmpImage[coordinate.first*imageWidth+coordinate.second] = 1;
