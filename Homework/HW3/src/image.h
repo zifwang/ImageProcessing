@@ -65,6 +65,11 @@ public:
      */
     string getAlgorithm();
 
+    /**
+     * Return the input file name
+     */
+    string getFileName_input();
+
 private:
     int imageHeight;
     int imageWidth;

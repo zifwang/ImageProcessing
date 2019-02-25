@@ -10,6 +10,7 @@
 #include "morphology.h"
 #include "defectDetection.h"
 #include "objectAnalysis.h"
+#include "geoTransformation.h"
 
 using namespace std;
 
@@ -60,15 +61,20 @@ int main(int argc, char** argv){
         imageData.setOutputImage(objImg.output(),objImg.getImageSize_gray()); 
         imageData.writeImage(objImg.getImageSize_gray());   
     }
+    else if(flags.algorithm == "GeoTransformation"){
+        geoTransformation geoModifiedImg;   
+        geoModifiedImg.init_image(imageData);
+        geoModifiedImg.methodGEO();
+    }
     
 
 
 
     
-    // else{
-    //     cout << "Error: the input algorithm is not found." << endl;
-    //     exit(EXIT_FAILURE);
-    // }
+    else{
+        cout << "Error: the input algorithm is not found." << endl;
+        exit(EXIT_FAILURE);
+    }
 
     return 0;
 }

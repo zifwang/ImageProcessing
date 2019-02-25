@@ -88,3 +88,8 @@ int image::getBytesPerPixel(){
 string image::getAlgorithm(){
     return algorithm;
 }
+
+string image::getFileName_input(){
+    return inputFilename;
+}
+

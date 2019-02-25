@@ -1,4 +1,6 @@
 main.o: main.cpp flags.h image.h morphology.h defectDetection.h \
- objectAnalysis.h
+ objectAnalysis.h geoTransformation.h
 flags.o: flags.cpp flags.h
 image.o: image.cpp image.h flags.h
+geoTransformation.o: geoTransformation.cpp image.h flags.h \
+ geoTransformation.h
