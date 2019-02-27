@@ -4,6 +4,17 @@
         "string": "cpp",
         "iostream": "cpp",
         "new": "cpp",
-        "ostream": "cpp"
+        "ostream": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "list": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "initializer_list": "cpp",
+        "string_view": "cpp",
+        "chrono": "cpp",
+        "complex": "cpp",
+        "utility": "cpp",
+        "cmath": "cpp"
     }
 }

@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>
+#include <map>
 #include <utility>
 #include <math.h>
 #include "image.h"
@@ -88,7 +89,17 @@ private:
 
 
     /**
-     * This function is used to find possible corners in the image
+     * This function is used to find possible corners in the image by haris method
      */
     vector<pair<int,int>> getPossibleCorners(unsigned char* inputImage, int imageHeight, int imageWidth, double RThreshold);
+
+    /**
+     * This function is used to find the four corner
+     */
+    vector<pair<int,int>> limitFourCorners(vector<pair<int,int>> possibleCorners); 
+
+    /**
+     * Find 3 holes in the main image
+     */
+    vector<pair<int,int>> locate3holes(unsigned char* image, vector<pair<int,int>> Corners, int imageHeight, int imageWidth);
 };
