@@ -12,6 +12,7 @@
 #include "geoTransformation.h"
 
 #define PI 3.14159265
+#define INT_MAX 2147483647
 
 
 using namespace std;
@@ -95,25 +96,65 @@ void helper_print_points(vector<pair<int,int>> corners){
     }
 }
 
-double* rotated_image(vector<pair<int,int>> corners, unsigned char* subImage, int subImgHeight, int subImgWidth){
+/**
+ * Image rotation
+ */ 
+double* geoTransformation::bilinearInterpolation_rotation(double* img, int imgHeight, int imgWidth){
+    double pixel_above, pixel_below, pixel_left, pixel_right;
+    double* modImage = new double[imgHeight*imgWidth];
+    for(int i = 0; i < imgHeight; i++){
+        for(int j = 0; j < imgWidth; j++){
+            modImage[(i)*imgWidth+j] = 255;
+        }
+    }
+    
+    for(int i = 1; i < imgHeight-1; i++){
+        for(int j = 1; j < imgWidth-1; j++){
+            // get four sounring pixels
+            if(img[(i)*imgWidth+j] == 255){
+                pixel_above = img[(i-1)*imgWidth+j];
+                pixel_below = img[(i+1)*imgWidth+j];
+                pixel_left = img[(i)*imgWidth+j-1];
+                pixel_right = img[(i)*imgWidth+j+1];
+                if(pixel_above != 255 && pixel_below != 255 && pixel_left != 255 && pixel_right != 255){
+                    modImage[(i)*imgWidth+j] = (double(pixel_above+pixel_below+pixel_left+pixel_right))/4;
+                    // if(i == 98 && j == 101){
+                    //     cout << pixel_above << " " << pixel_below << " " << pixel_left << " " << pixel_right << endl;
+                    //     cout << modImage[(i)*imgWidth+j];
+                    // }
+                }
+                else{
+                    modImage[(i)*imgWidth+j] = img[(i)*imgWidth+j];
+                }
+            }
+            else{
+                modImage[(i)*imgWidth+j] = img[(i)*imgWidth+j];
+            }
+        }
+    }
+
+    return modImage;
+}
+
+double* geoTransformation::rotated_image_unsigned(vector<pair<int,int>> corners, unsigned char* subImage, int subImgHeight, int subImgWidth, double angle){
     // Get height & width & angle of each sub image
-    int true_height = sqrt(pow((corners[1].first-corners[2].first),2)+pow((corners[1].second-corners[2].second),2)); 
-    int true_width = sqrt(pow((corners[1].first-corners[3].first),2)+pow((corners[1].second-corners[3].second),2)); 
-    double angle = atan(double(corners[1].second-corners[3].second)/double(corners[1].first-corners[3].first));
+    // int true_height = sqrt(pow((corners[1].first-corners[2].first),2)+pow((corners[1].second-corners[2].second),2)); 
+    // int true_width = sqrt(pow((corners[1].first-corners[3].first),2)+pow((corners[1].second-corners[3].second),2)); 
+    // double angle = atan(double(corners[1].second-corners[3].second)/double(corners[1].first-corners[3].first));
     
     int height_min = corners[2].second;
     int height_max = corners[3].second;
     int width_min = corners[0].first;
     int width_max = corners[1].first;
-    cout << height_min << " " << height_max << " " << width_min << " " << width_max << endl;
+    // cout << height_min << " " << height_max << " " << width_min << " " << width_max << endl;
     int center_x = (width_max+width_min)/2;
     int center_y = (height_max+height_min)/2;
-    cout << center_x << " "<< center_y << endl;
+    // cout << center_x << " "<< center_y << endl;
     // cout << width_min << " " << width_max << " " << height_min << " " << height_max << endl;
     
     double cos_theta = cos(-angle);
     double sin_theta = sin(-angle);
-    cout << -angle << " " << cos_theta << " " << sin_theta << endl;
+    // cout << -angle << " " << cos_theta << " " << sin_theta << endl;
     // double rotation_matrix[3][3] = {{cos_theta,-sin_theta,0},{sin_theta,cos_theta,0},{0,0,1}};
     double rotated_x, rotated_y;
     
@@ -128,6 +169,7 @@ double* rotated_image(vector<pair<int,int>> corners, unsigned char* subImage, in
 
     for(int y = height_min; y <= height_max; y++){
         for(int x = width_min; x <= width_max; x++){
+            // cout << y << " " << x << endl;
             rotated_x = x - center_x;
             rotated_y = y - center_y;
             double rotated_x_tmp = rotated_x;
@@ -136,12 +178,211 @@ double* rotated_image(vector<pair<int,int>> corners, unsigned char* subImage, in
             rotated_y = sin_theta*rotated_x_tmp + cos_theta*rotated_y_tmp;
             rotated_x = rotated_x + center_x;
             rotated_y = rotated_y + center_y;
-            returnImage[int(rotated_y)*subImgWidth+int(rotated_x)] = tmpImage[y][x];
+            // cout << rotated_y << " " << rotated_x << endl;
+            if(rotated_x > 0 && rotated_y > 0 && rotated_x < subImgWidth && rotated_y < subImgHeight){
+                returnImage[int(rotated_y)*subImgWidth+int(rotated_x)] = tmpImage[y][x];
+            }
         }
     }
 
     return returnImage;
 }
+
+double* geoTransformation::rotated_image_90(vector<pair<int,int>> corners, double* subImage, int subImgHeight, int subImgWidth){
+    // Get height & width & angle of each sub image
+    // int true_height = sqrt(pow((corners[1].first-corners[2].first),2)+pow((corners[1].second-corners[2].second),2)); 
+    // int true_width = sqrt(pow((corners[1].first-corners[3].first),2)+pow((corners[1].second-corners[3].second),2)); 
+    // double angle = atan(double(corners[1].second-corners[3].second)/double(corners[1].first-corners[3].first));
+    // find height_min & height_max & width_min & width_max
+    int height_min = subImgHeight;
+    int height_max = 0;
+    int width_min = subImgWidth;
+    int width_max = 0;
+    for(int i = 0; i < corners.size(); i++){
+        if(corners[i].second > height_max){
+            height_max = corners[i].second;
+        }
+        if(corners[i].second < height_min){
+            height_min = corners[i].second;
+        }
+        if(corners[i].first > width_max){
+            width_max = corners[i].first;
+        }
+        if(corners[i].first < width_min){
+            width_min = corners[i].first;
+        }
+    }
+
+    // cout << height_min << " " << height_max << " " << width_min << " " << width_max << endl;
+    int center_x = (width_max+width_min)/2;
+    int center_y = (height_max+height_min)/2;
+    // cout << center_x << " "<< center_y << endl;
+    // cout << width_min << " " << width_max << " " << height_min << " " << height_max << endl;
+    
+    double cos_theta = 0.0;
+    double sin_theta = 1;
+    // cout << -angle << " " << cos_theta << " " << sin_theta << endl;
+    // double rotation_matrix[3][3] = {{cos_theta,-sin_theta,0},{sin_theta,cos_theta,0},{0,0,1}};
+    double rotated_x, rotated_y;
+    
+    double tmpImage[subImgHeight][subImgWidth];
+    double* returnImage = new double[subImgHeight*subImgWidth]; 
+    for(int i = 0; i < subImgHeight; i++){
+        for(int j = 0; j < subImgWidth; j++){
+            tmpImage[i][j] = (double)subImage[i*subImgWidth+j];
+            returnImage[i*subImgWidth+j] = 255;
+        }
+    }
+
+    for(int y = height_min; y <= height_max; y++){
+        for(int x = width_min; x <= width_max; x++){
+            // cout << y << " " << x << endl;
+            rotated_x = x - center_x;
+            rotated_y = y - center_y;
+            double rotated_x_tmp = rotated_x;
+            double rotated_y_tmp = rotated_y;
+            rotated_x = cos_theta*rotated_x_tmp - sin_theta*rotated_y_tmp;
+            rotated_y = sin_theta*rotated_x_tmp + cos_theta*rotated_y_tmp;
+            rotated_x = rotated_x + center_x;
+            rotated_y = rotated_y + center_y;
+            // cout << rotated_y << " " << rotated_x << endl;
+            if(rotated_x > 0 && rotated_y > 0 && rotated_x < subImgWidth && rotated_y < subImgHeight){
+                returnImage[int(rotated_y)*subImgWidth+int(rotated_x)] = tmpImage[y][x];
+            }
+        }
+    }
+
+    return returnImage;
+}
+
+/**
+ * Image Scaling
+ */ 
+double* scaling_image_doubled(vector<pair<int,int>> &corners, double* subImage, int subImgHeight, int subImgWidth, int targetSize){
+    int height_min = subImgHeight;
+    int height_max = 0;
+    int width_min = subImgWidth;
+    int width_max = 0;
+    for(int i = 0; i < corners.size(); i++){
+        if(corners[i].second > height_max){
+            height_max = corners[i].second;
+        }
+        if(corners[i].second < height_min){
+            height_min = corners[i].second;
+        }
+        if(corners[i].first > width_max){
+            width_max = corners[i].first;
+        }
+        if(corners[i].first < width_min){
+            width_min = corners[i].first;
+        }
+    }
+    int sub_imageWidth = width_max - width_min;
+    int sub_imageHeight = height_max - height_min;
+    double* ori_image = new double[subImgHeight*subImgWidth];
+    double* scaled_image = new double[subImgHeight*subImgWidth];
+    // set back_ground to 255
+    for(long i = 0; i < subImgHeight*subImgWidth; i++){
+        ori_image[i] = 255;
+        scaled_image[i] = 255;
+    }
+    // move the object to the top-left corner
+    for(int i = height_min; i <= height_max; i++){
+        for(int j = width_min; j <= width_max; j++){
+            ori_image[(i-(height_min-10))*subImgWidth+(j-(width_min-10))] = subImage[i*subImgWidth+j];
+        }
+    }
+    int new_beign_height = height_min - (height_min-10);
+    int new_beign_width = width_min - (width_min-10);
+
+    // scaling 
+    double scale = targetSize/subImgHeight;
+
+    // get location
+    int new_height, new_width;
+    for(int i = new_beign_height; i < new_beign_height+sub_imageHeight; i++){
+        for(int j = new_beign_width; j < new_beign_width+sub_imageWidth; j++){
+            new_height = scale*i;
+            new_width = scale*j;
+            scaled_image[new_height*subImgWidth+new_width] = ori_image[i*subImgWidth+j];
+        }
+    }
+    return scaled_image;
+}
+
+
+/**
+ * Corner coordinates update
+ */  
+vector<pair<int,int>> geoTransformation::update_corners(vector<pair<int,int>> corners,double angle){
+    vector<pair<int,int>> new_corners;
+    int height_min = corners[2].second;
+    int height_max = corners[3].second;
+    int width_min = corners[0].first;
+    int width_max = corners[1].first;
+    int center_x = (width_max+width_min)/2;
+    int center_y = (height_max+height_min)/2;
+    double rotated_x;
+    double rotated_y;
+    double cos_theta = cos(-angle);
+    double sin_theta = sin(-angle);
+    for(int i = 0; i < corners.size(); i++){
+        rotated_x = corners[i].first - center_x;
+        rotated_y = corners[i].second - center_y;
+        double rotated_x_tmp = rotated_x;
+        double rotated_y_tmp = rotated_y;
+        rotated_x = cos_theta*rotated_x_tmp - sin_theta*rotated_y_tmp;
+        rotated_y = sin_theta*rotated_x_tmp + cos_theta*rotated_y_tmp;
+        rotated_x = rotated_x + center_x;
+        rotated_y = rotated_y + center_y;
+        new_corners.push_back(make_pair(rotated_x,rotated_y));
+    }
+    return new_corners;
+
+}
+vector<pair<int,int>> geoTransformation::update_corners_90(vector<pair<int,int>> corners){
+    vector<pair<int,int>> new_corners;
+    int height_min = INT_MAX;
+    int height_max = 0;
+    int width_min = INT_MAX;
+    int width_max = 0;
+    for(int i = 0; i < corners.size(); i++){
+        if(corners[i].second > height_max){
+            height_max = corners[i].second;
+        }
+        if(corners[i].second < height_min){
+            height_min = corners[i].second;
+        }
+        if(corners[i].first > width_max){
+            width_max = corners[i].first;
+        }
+        if(corners[i].first < width_min){
+            width_min = corners[i].first;
+        }
+    }
+    int center_x = (width_max+width_min)/2;
+    int center_y = (height_max+height_min)/2;
+    double rotated_x;
+    double rotated_y;
+    double cos_theta = 0;
+    double sin_theta = 1;
+    for(int i = 0; i < corners.size(); i++){
+        rotated_x = corners[i].first - center_x;
+        rotated_y = corners[i].second - center_y;
+        double rotated_x_tmp = rotated_x;
+        double rotated_y_tmp = rotated_y;
+        rotated_x = cos_theta*rotated_x_tmp - sin_theta*rotated_y_tmp;
+        rotated_y = sin_theta*rotated_x_tmp + cos_theta*rotated_y_tmp;
+        rotated_x = rotated_x + center_x;
+        rotated_y = rotated_y + center_y;
+        new_corners.push_back(make_pair(rotated_x,rotated_y));
+    }
+    return new_corners;
+
+}
+
+
+
 
 
 
@@ -153,46 +394,67 @@ void geoTransformation::methodGEO(){
     // Get corners
     vector<pair<int,int>> corners = getPossibleCorners(inputBuffer,imageHeight,imageWidth,513300000000);
     corners = locate3holes(inputBuffer,corners, imageHeight, imageWidth);
-    
+    // Get a tmp ori_image;
+    double* ori_image = new double[imageHeight*imageWidth];
+    for(long i = 0; i < imageHeight*imageWidth; i++){
+        ori_image[i] = (double)inputBuffer[i];
+    }
+
     // Sub 1
     vector<pair<int,int>> corners_1 = getPossibleCorners(subImage1,256,256,400000000000);
     corners_1 = limitFourCorners(corners_1);
-    helper_print_points(corners_1);
-
     // Sub 2
     vector<pair<int,int>> corners_2 = getPossibleCorners(subImage2,256,256,200000000000);
     corners_2 = limitFourCorners(corners_2);
-    // helper_print_points(corners_2);
-
     // Sub 3
     vector<pair<int,int>> corners_3 = getPossibleCorners(subImage3,256,256,1500000000000);
     corners_3 = limitFourCorners(corners_3);
-    // helper_print_points(corners_3);
-    
+
     // Get height & width & angle of each sub image
-    // int subImage_1_height = sqrt(pow((corners_1[1].first-corners_1[2].first),2)+pow((corners_1[1].second-corners_1[2].second),2)); 
-    // int subImage_1_width = sqrt(pow((corners_1[1].first-corners_1[3].first),2)+pow((corners_1[1].second-corners_1[3].second),2)); 
-    // double angle_1 = atan((corners_1[1].second-corners_1[3].second)/(corners_1[1].first-corners_1[3].first));
- 
-    // int subImage_2_height = sqrt(pow((corners_2[1].first-corners_2[2].first),2)+pow((corners_2[1].second-corners_2[2].second+1),2)); 
-    // int subImage_2_width = sqrt(pow((corners_2[1].first-corners_2[3].first),2)+pow((corners_2[1].second-corners_2[3].second),2)); 
-    // double angle_2 = atan((double((corners_2[1].second-corners_2[3].second))/double(corners_2[1].first-corners_2[3].first)));
+    double angle_1 = atan(double(corners_1[1].second-corners_1[3].second)/double(corners_1[1].first-corners_1[3].first));
+    double angle_2 = atan((double((corners_2[1].second-corners_2[3].second))/double(corners_2[1].first-corners_2[3].first)));
+    double angle_3 = atan((corners_3[1].second-corners_3[3].second)/(corners_3[1].first-corners_3[3].first-1))-0.03;
+    
+    // Rotation
+    // 1st
+    double* rotated_sub_img_1 = new double[256*256];
+    rotated_sub_img_1 = rotated_image_unsigned(corners_1,subImage1,256,256,angle_1);
+    vector<pair<int,int>> corners_1_update = update_corners(corners_1,angle_1);
+    rotated_sub_img_1 = bilinearInterpolation_rotation(rotated_sub_img_1,256,256);
+    int subImage_1_height = height_finder(corners_1_update);
+    int subImage_1_width = width_finder(corners_1_update);
+    rotated_sub_img_1 = scaling_image_doubled(corners_1_update, rotated_sub_img_1, 256, 256, 1);
+    
+    // 2st
+    double* rotated_sub_img_2 = new double[256*256];
+    rotated_sub_img_2 = rotated_image_unsigned(corners_2,subImage2,256,256,angle_2);
+    rotated_sub_img_2 = bilinearInterpolation_rotation(rotated_sub_img_2,256,256);
+    vector<pair<int,int>> corners_2_update = update_corners(corners_2,angle_2);
+    rotated_sub_img_2 = rotated_image_90(corners_2_update,rotated_sub_img_2,256,256);
+    corners_2_update = update_corners_90(corners_2_update);
+    int subImage_2_height = height_finder(corners_2_update);
+    int subImage_2_width = width_finder(corners_2_update);
 
-    // int subImage_3_height = sqrt(pow((corners_3[1].first-corners_3[2].first),2)+pow((corners_3[1].second-corners_3[2].second),2)); 
-    // int subImage_3_width = sqrt(pow((corners_3[1].first-corners_3[3].first),2)+pow((corners_3[1].second-corners_3[3].second-1),2)); 
-    // double angle_3 = atan((corners_3[1].second-corners_3[3].second)/(corners_3[1].first-corners_3[3].first-1));
-    // cout << angle_1 << endl;
-    // cout << subImage_1_height << " " << subImage_1_width << endl;
-    // cout << angle_2 << endl;
-    // cout << subImage_2_height << " " << subImage_2_width << endl;
-    // cout << angle_3 << endl;
-    // cout << subImage_3_height << " " << subImage_3_width << endl;
+    // 3rd
+    double* rotated_sub_img_3 = new double[256*256];
+    rotated_sub_img_3 = rotated_image_unsigned(corners_3,subImage3,256,256,angle_3);
+    vector<pair<int,int>> corners_3_update = update_corners(corners_3,angle_3);
+    rotated_sub_img_3 = bilinearInterpolation_rotation(rotated_sub_img_3,256,256);
+    rotated_sub_img_3 = rotated_image_90(corners_3_update,rotated_sub_img_3,256,256);
+    corners_3_update = update_corners_90(corners_3_update);
+    rotated_sub_img_3 = rotated_image_90(corners_3_update,rotated_sub_img_3,256,256);
+    corners_3_update = update_corners_90(corners_3_update);
+    rotated_sub_img_3 = rotated_image_90(corners_3_update,rotated_sub_img_3,256,256);
+    corners_3_update = update_corners_90(corners_3_update);
+    int subImage_3_height = height_finder(corners_3_update);
+    int subImage_3_width = width_finder(corners_3_update);
 
-    unsigned char* tryOut = new unsigned char[256*256];
-    double* outputImage = new double[256*256];
-    outputImage = rotated_image(corners_1,subImage1,256,256);
+
+    // Scaling
+
+    unsigned char* buffer = new unsigned char[256*256];
     for(long i = 0; i < 256*256; i++){
-        tryOut[i] = (unsigned char)outputImage[i];
+        buffer[i] = rotated_sub_img_1[i];
     }
     FILE *file;
     file = fopen("try.raw","wb");
@@ -200,11 +462,9 @@ void geoTransformation::methodGEO(){
         cout << "Error opening file: try.raw" << endl;
         exit(EXIT_FAILURE);
     }else{
-        fwrite(tryOut, sizeof(unsigned char), 256*256, file);
+        fwrite(buffer, sizeof(unsigned char), 256*256, file);
     }
     fclose(file);
-    
-    
 
 
 }
@@ -502,4 +762,48 @@ vector<pair<int,int>> geoTransformation::locate3holes(unsigned char* image,vecto
 
     }
     return leftCorners;
+}
+
+int geoTransformation::height_finder(vector<pair<int,int>> corners){
+    int height_min = INT_MAX;
+    int height_max = 0;
+    int width_min = INT_MAX;
+    int width_max = 0;
+    for(int i = 0; i < corners.size(); i++){
+        if(corners[i].second > height_max){
+            height_max = corners[i].second;
+        }
+        if(corners[i].second < height_min){
+            height_min = corners[i].second;
+        }
+        if(corners[i].first > width_max){
+            width_max = corners[i].first;
+        }
+        if(corners[i].first < width_min){
+            width_min = corners[i].first;
+        }
+    }
+    return height_max-height_min;
+}
+
+int geoTransformation::width_finder(vector<pair<int,int>> corners){
+    int height_min = INT_MAX;
+    int height_max = 0;
+    int width_min = INT_MAX;
+    int width_max = 0;
+    for(int i = 0; i < corners.size(); i++){
+        if(corners[i].second > height_max){
+            height_max = corners[i].second;
+        }
+        if(corners[i].second < height_min){
+            height_min = corners[i].second;
+        }
+        if(corners[i].first > width_max){
+            width_max = corners[i].first;
+        }
+        if(corners[i].first < width_min){
+            width_min = corners[i].first;
+        }
+    }
+    return width_max-width_min;
 }

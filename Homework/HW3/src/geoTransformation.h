@@ -59,6 +59,19 @@ public:
      */
     void methodGEO();
 
+    /**
+    * Image rotation
+    */  
+    double* bilinearInterpolation_rotation(double* img, int imgHeight, int imgWidth);
+    double* rotated_image_unsigned(vector<pair<int,int>> corners, unsigned char* subImage, int subImgHeight, int subImgWidth, double angle);
+    double* rotated_image_90(vector<pair<int,int>> corners, double* subImage, int subImgHeight, int subImgWidth);
+    
+    /**
+    * Corner coordinates update
+    */  
+    vector<pair<int,int>> update_corners(vector<pair<int,int>> corners,double angle);
+    vector<pair<int,int>> update_corners_90(vector<pair<int,int>> corners);
+
 private:
     int imageHeight;                    // Height of input image
     int imageWidth;                     // Width of input image
@@ -102,4 +115,7 @@ private:
      * Find 3 holes in the main image
      */
     vector<pair<int,int>> locate3holes(unsigned char* image, vector<pair<int,int>> Corners, int imageHeight, int imageWidth);
+
+    int width_finder(vector<pair<int,int>> corners);
+    int height_finder(vector<pair<int,int>> corners);
 };
