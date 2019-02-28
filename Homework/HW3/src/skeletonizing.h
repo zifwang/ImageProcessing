@@ -19,7 +19,7 @@ class skeletonzing : public morphology{
 public:
     void methodSkeletonzing(){
         // Declare a tmpImage pointer 
-        int* tmpImage = getOriImage();
+        int* tmpImage = getOriImage_0_1();
 
         cout << "Finish normalize image" << endl;
         
