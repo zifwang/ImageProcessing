@@ -258,12 +258,13 @@ double* geoTransformation::rotated_image_90(vector<pair<int,int>> corners, doubl
 /**
  * Image Scaling
  */ 
-double* scaling_image_doubled(vector<pair<int,int>> &corners, double* subImage, int subImgHeight, int subImgWidth, int targetSize){
+double* geoTransformation::scaling_image_doubled(vector<pair<int,int>> &corners, double* subImage, int subImgHeight, int subImgWidth, int targetSize){
     int height_min = subImgHeight;
     int height_max = 0;
     int width_min = subImgWidth;
     int width_max = 0;
     for(int i = 0; i < corners.size(); i++){
+        // cout << "ORI: " << corners[i].first << " " << corners[i].second << endl;
         if(corners[i].second > height_max){
             height_max = corners[i].second;
         }
@@ -279,34 +280,55 @@ double* scaling_image_doubled(vector<pair<int,int>> &corners, double* subImage, 
     }
     int sub_imageWidth = width_max - width_min;
     int sub_imageHeight = height_max - height_min;
-    double* ori_image = new double[subImgHeight*subImgWidth];
-    double* scaled_image = new double[subImgHeight*subImgWidth];
+    // scaling parameter
+    double scale = double(targetSize)/sub_imageHeight;
+    double ratio = double(1)/scale;
+    // cout << ratio << endl;
+
+    double* scaled_image = new double[int(subImgHeight*scale)*int(subImgWidth*scale)];
+    // cout << int(subImgHeight*scale) << endl;
+    // cout << int(subImgWidth*scale)<< endl;
     // set back_ground to 255
-    for(long i = 0; i < subImgHeight*subImgWidth; i++){
-        ori_image[i] = 255;
-        scaled_image[i] = 255;
-    }
-    // move the object to the top-left corner
-    for(int i = height_min; i <= height_max; i++){
-        for(int j = width_min; j <= width_max; j++){
-            ori_image[(i-(height_min-10))*subImgWidth+(j-(width_min-10))] = subImage[i*subImgWidth+j];
+    for(int i = 0; i < int(subImgHeight*scale); i++){
+        for(int j = 0; j < int(subImgWidth*scale); j++){
+            scaled_image[i*int(subImgWidth*scale)+j] = 255;
         }
     }
-    int new_beign_height = height_min - (height_min-10);
-    int new_beign_width = width_min - (width_min-10);
+    
+    double est_x, est_y;
+    int lt_x, lt_y;
+    double scale_x, scale_y;
+    bool is_vec_updated[4] = {false,false,false,false};
 
-    // scaling 
-    double scale = targetSize/subImgHeight;
+    // update corner
+    for(int k = 0; k < corners.size(); k++){
+        // cout << "ORI: "<< corners[k].first << " " << corners[k].second << endl;
+        corners[k].first = int(double(corners[k].first)*scale);
+        corners[k].second = int(double(corners[k].second)*scale);
+        // cout << "MOD: "<< corners[k].first << " " << corners[k].second << endl;
+    }
 
-    // get location
-    int new_height, new_width;
-    for(int i = new_beign_height; i < new_beign_height+sub_imageHeight; i++){
-        for(int j = new_beign_width; j < new_beign_width+sub_imageWidth; j++){
-            new_height = scale*i;
-            new_width = scale*j;
-            scaled_image[new_height*subImgWidth+new_width] = ori_image[i*subImgWidth+j];
+    // Scaling
+    for(int i = 0; i < int(subImgHeight*scale); i++){
+        for(int j = 0; j < int(subImgWidth*scale); j++){
+            est_y = ratio*double(i);
+            est_x = ratio*double(j);
+
+            lt_y = int(est_y);
+            lt_x = int(est_x);
+            
+            scale_y = est_y - double(lt_y);
+            scale_x = est_x - double(lt_x);
+
+            double val = (1.0 - scale_x)*(1-scale_y)*subImage[lt_y*subImgWidth+lt_x]
+                         + (1.0 - scale_x)*scale_y*subImage[(lt_y+1)*subImgWidth+lt_x]
+                         + scale_x*scale_y*subImage[(lt_y+1)*subImgWidth+lt_x+1]
+                         + scale_x*(1.0-scale_y)*subImage[(lt_y)*subImgWidth+lt_x+1];
+
+            scaled_image[i*int(subImgWidth*scale)+j] = val;
         }
     }
+
     return scaled_image;
 }
 
@@ -382,10 +404,6 @@ vector<pair<int,int>> geoTransformation::update_corners_90(vector<pair<int,int>>
 }
 
 
-
-
-
-
 /**
  * Implement GEO transformation
  */
@@ -394,12 +412,17 @@ void geoTransformation::methodGEO(){
     // Get corners
     vector<pair<int,int>> corners = getPossibleCorners(inputBuffer,imageHeight,imageWidth,513300000000);
     corners = locate3holes(inputBuffer,corners, imageHeight, imageWidth);
+    pair<int,int> corner_1 = corners[1];
+    pair<int,int> corner_2 = corners[0];
+    pair<int,int> corner_3 = corners[2];
+
     // Get a tmp ori_image;
     double* ori_image = new double[imageHeight*imageWidth];
     for(long i = 0; i < imageHeight*imageWidth; i++){
         ori_image[i] = (double)inputBuffer[i];
     }
 
+    
     // Sub 1
     vector<pair<int,int>> corners_1 = getPossibleCorners(subImage1,256,256,400000000000);
     corners_1 = limitFourCorners(corners_1);
@@ -421,10 +444,21 @@ void geoTransformation::methodGEO(){
     rotated_sub_img_1 = rotated_image_unsigned(corners_1,subImage1,256,256,angle_1);
     vector<pair<int,int>> corners_1_update = update_corners(corners_1,angle_1);
     rotated_sub_img_1 = bilinearInterpolation_rotation(rotated_sub_img_1,256,256);
-    int subImage_1_height = height_finder(corners_1_update);
-    int subImage_1_width = width_finder(corners_1_update);
-    rotated_sub_img_1 = scaling_image_doubled(corners_1_update, rotated_sub_img_1, 256, 256, 1);
+    // scaling
+    int sub_1_width = mod_sub_image_width(corners_1_update,256,256,160);
+    int sub_1_height = mod_sub_image_height(corners_1_update,256,256,160);
+    double* scaled_sub_img_1 = scaling_image_doubled(corners_1_update, rotated_sub_img_1, 256, 256, 160);
+    delete[] rotated_sub_img_1;
+    int sub_1_tl_x = find_x_min(corners_1_update);
+    int sub_1_tl_y = find_y_min(corners_1_update);
+    // Translation
+    for(int i = 0; i < 160; i++){
+        for(int j = 0; j < 160; j++){
+            ori_image[(corner_1.second+i)*imageWidth+j+corner_1.first] = scaled_sub_img_1[(i+sub_1_tl_y+2)*sub_1_width+j+sub_1_tl_x+1];
+        }
+    }
     
+
     // 2st
     double* rotated_sub_img_2 = new double[256*256];
     rotated_sub_img_2 = rotated_image_unsigned(corners_2,subImage2,256,256,angle_2);
@@ -432,8 +466,20 @@ void geoTransformation::methodGEO(){
     vector<pair<int,int>> corners_2_update = update_corners(corners_2,angle_2);
     rotated_sub_img_2 = rotated_image_90(corners_2_update,rotated_sub_img_2,256,256);
     corners_2_update = update_corners_90(corners_2_update);
-    int subImage_2_height = height_finder(corners_2_update);
-    int subImage_2_width = width_finder(corners_2_update);
+    // scaling
+    int sub_2_width = mod_sub_image_width(corners_2_update,256,256,160);
+    int sub_2_height = mod_sub_image_height(corners_2_update,256,256,160);
+    double* scaled_sub_img_2 = scaling_image_doubled(corners_2_update, rotated_sub_img_2, 256, 256, 160);
+    delete[] rotated_sub_img_2;
+    int sub_2_tl_x = find_x_min(corners_2_update);
+    int sub_2_tl_y = find_y_min(corners_2_update);
+    // Translation
+    for(int i = 0; i < 160; i++){
+        for(int j = 0; j < 160; j++){
+            ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first] = scaled_sub_img_2[(i+sub_2_tl_y+1)*sub_2_width+j+sub_2_tl_x+1];
+        }
+    }
+    
 
     // 3rd
     double* rotated_sub_img_3 = new double[256*256];
@@ -446,15 +492,26 @@ void geoTransformation::methodGEO(){
     corners_3_update = update_corners_90(corners_3_update);
     rotated_sub_img_3 = rotated_image_90(corners_3_update,rotated_sub_img_3,256,256);
     corners_3_update = update_corners_90(corners_3_update);
-    int subImage_3_height = height_finder(corners_3_update);
-    int subImage_3_width = width_finder(corners_3_update);
-
-
     // Scaling
+    int sub_3_width = mod_sub_image_width(corners_3_update,256,256,160);
+    int sub_3_height = mod_sub_image_height(corners_3_update,256,256,160);
+    double* scaled_sub_img_3 = scaling_image_doubled(corners_3_update, rotated_sub_img_3, 256, 256, 160);
+    delete[] rotated_sub_img_3;
+    int sub_3_tl_x = find_x_min(corners_3_update);
+    int sub_3_tl_y = find_y_min(corners_3_update);
+    // Translation
+    for(int i = 0; i < 160; i++){
+        for(int j = 0; j < 160; j++){
+            ori_image[(corner_3.second+i)*imageWidth+j+corner_3.first] = scaled_sub_img_3[(i+sub_3_tl_y+1)*sub_3_width+j+sub_3_tl_x];
+        }
+    }
+    
 
-    unsigned char* buffer = new unsigned char[256*256];
-    for(long i = 0; i < 256*256; i++){
-        buffer[i] = rotated_sub_img_1[i];
+
+
+    unsigned char* buffer = new unsigned char[512*512];
+    for(long i = 0; i < 512*512; i++){
+        buffer[i] = ori_image[i];
     }
     FILE *file;
     file = fopen("try.raw","wb");
@@ -462,7 +519,7 @@ void geoTransformation::methodGEO(){
         cout << "Error opening file: try.raw" << endl;
         exit(EXIT_FAILURE);
     }else{
-        fwrite(buffer, sizeof(unsigned char), 256*256, file);
+        fwrite(buffer, sizeof(unsigned char), 512*512, file);
     }
     fclose(file);
 
@@ -806,4 +863,48 @@ int geoTransformation::width_finder(vector<pair<int,int>> corners){
         }
     }
     return width_max-width_min;
+}
+
+int geoTransformation::find_x_min(vector<pair<int,int>> corners){
+    int height_min = INT_MAX;
+    int height_max = 0;
+    int width_min = INT_MAX;
+    int width_max = 0;
+    for(int i = 0; i < corners.size(); i++){
+        if(corners[i].second > height_max){
+            height_max = corners[i].second;
+        }
+        if(corners[i].second < height_min){
+            height_min = corners[i].second;
+        }
+        if(corners[i].first > width_max){
+            width_max = corners[i].first;
+        }
+        if(corners[i].first < width_min){
+            width_min = corners[i].first;
+        }
+    }
+    return width_min;
+}
+
+int geoTransformation::find_y_min(vector<pair<int,int>> corners){
+    int height_min = INT_MAX;
+    int height_max = 0;
+    int width_min = INT_MAX;
+    int width_max = 0;
+    for(int i = 0; i < corners.size(); i++){
+        if(corners[i].second > height_max){
+            height_max = corners[i].second;
+        }
+        if(corners[i].second < height_min){
+            height_min = corners[i].second;
+        }
+        if(corners[i].first > width_max){
+            width_max = corners[i].first;
+        }
+        if(corners[i].first < width_min){
+            width_min = corners[i].first;
+        }
+    }
+    return height_min;
 }

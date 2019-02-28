@@ -67,6 +67,11 @@ public:
     double* rotated_image_90(vector<pair<int,int>> corners, double* subImage, int subImgHeight, int subImgWidth);
     
     /**
+     * Image Scaling
+     */
+    double* scaling_image_doubled(vector<pair<int,int>> &corners, double* subImage, int subImgHeight, int subImgWidth, int targetSize);
+
+    /**
     * Corner coordinates update
     */  
     vector<pair<int,int>> update_corners(vector<pair<int,int>> corners,double angle);
@@ -118,4 +123,61 @@ private:
 
     int width_finder(vector<pair<int,int>> corners);
     int height_finder(vector<pair<int,int>> corners);
+    int find_x_min(vector<pair<int,int>> corners);
+    int find_y_min(vector<pair<int,int>> corners);
+    int mod_sub_image_width(vector<pair<int,int>> corners, int subImgHeight, int subImgWidth, int targetSize){
+        int height_min = subImgHeight;
+        int height_max = 0;
+        int width_min = subImgWidth;
+        int width_max = 0;
+        for(int i = 0; i < corners.size(); i++){
+            // cout << "ORI: " << corners[i].first << " " << corners[i].second << endl;
+            if(corners[i].second > height_max){
+                height_max = corners[i].second;
+            }
+            if(corners[i].second < height_min){
+                height_min = corners[i].second;
+            }
+            if(corners[i].first > width_max){
+                width_max = corners[i].first;
+            }
+            if(corners[i].first < width_min){
+                width_min = corners[i].first;
+            }
+        }
+        int sub_imageWidth = width_max - width_min;
+        int sub_imageHeight = height_max - height_min;
+        // scaling parameter
+        double scale = double(targetSize)/sub_imageHeight;
+        // double ratio = double(1)/scale;
+        return int(subImgWidth*scale);
+    }
+    int mod_sub_image_height(vector<pair<int,int>> corners, int subImgHeight, int subImgWidth, int targetSize){
+        int height_min = subImgHeight;
+        int height_max = 0;
+        int width_min = subImgWidth;
+        int width_max = 0;
+        for(int i = 0; i < corners.size(); i++){
+            // cout << "ORI: " << corners[i].first << " " << corners[i].second << endl;
+            if(corners[i].second > height_max){
+                height_max = corners[i].second;
+            }
+            if(corners[i].second < height_min){
+                height_min = corners[i].second;
+            }
+            if(corners[i].first > width_max){
+                width_max = corners[i].first;
+            }
+            if(corners[i].first < width_min){
+                width_min = corners[i].first;
+            }
+        }
+        int sub_imageWidth = width_max - width_min;
+        int sub_imageHeight = height_max - height_min;
+        // scaling parameter
+        double scale = double(targetSize)/sub_imageHeight;
+        // double ratio = double(1)/scale;
+        return int(subImgHeight*scale);
+    }
+
 };
