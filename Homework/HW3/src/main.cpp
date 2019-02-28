@@ -65,6 +65,8 @@ int main(int argc, char** argv){
         geoTransformation geoModifiedImg;   
         geoModifiedImg.init_image(imageData);
         geoModifiedImg.methodGEO();
+        imageData.setOutputImage(geoModifiedImg.output(),geoModifiedImg.getImageSize_gray()); 
+        imageData.writeImage(geoModifiedImg.getImageSize_gray()); 
     }
     
 

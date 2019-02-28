@@ -455,6 +455,19 @@ void geoTransformation::methodGEO(){
     for(int i = 0; i < 160; i++){
         for(int j = 0; j < 160; j++){
             ori_image[(corner_1.second+i)*imageWidth+j+corner_1.first] = scaled_sub_img_1[(i+sub_1_tl_y+2)*sub_1_width+j+sub_1_tl_x+1];
+            if(j == 0){
+                ori_image[(corner_1.second+i)*imageWidth+j+corner_1.first] = (ori_image[(corner_1.second+i)*imageWidth+j+corner_1.first-1]+scaled_sub_img_1[(i+sub_1_tl_y+2)*sub_1_width+j+sub_1_tl_x+2])/2;
+            }
+            if(j == 159){
+                // cout << j+ corner_1.first << endl;
+                ori_image[(corner_1.second+i)*imageWidth+j+corner_1.first] = (ori_image[(corner_1.second+i)*imageWidth+j+corner_1.first+1]+scaled_sub_img_1[(i+sub_1_tl_y+2)*sub_1_width+j+sub_1_tl_x])/2;
+            }
+            if(i ==  0){
+                ori_image[(corner_1.second+i)*imageWidth+j+corner_1.first] = (ori_image[(corner_1.second+i-1)*imageWidth+j+corner_1.first]+scaled_sub_img_1[(i+sub_1_tl_y+3)*sub_1_width+j+sub_1_tl_x+1])/2;
+            }
+            if(i ==  159){
+                ori_image[(corner_1.second+i)*imageWidth+j+corner_1.first] = (ori_image[(corner_1.second+i+1)*imageWidth+j+corner_1.first]+scaled_sub_img_1[(i+sub_1_tl_y+1)*sub_1_width+j+sub_1_tl_x+1])/2;
+            }
         }
     }
     
@@ -477,6 +490,23 @@ void geoTransformation::methodGEO(){
     for(int i = 0; i < 160; i++){
         for(int j = 0; j < 160; j++){
             ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first] = scaled_sub_img_2[(i+sub_2_tl_y+1)*sub_2_width+j+sub_2_tl_x+1];
+            // boundary smooth
+            if(j == 0){
+                ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first] = (ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first-1]+scaled_sub_img_2[(i+sub_2_tl_y+1)*sub_2_width+j+sub_2_tl_x+2])/2;
+            }
+            if(j == 159){
+                // cout << j + corner_2.first << endl;
+                ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first] = (ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first+1]+scaled_sub_img_2[(i+sub_2_tl_y+1)*sub_2_width+j+sub_2_tl_x])/2;
+                // cout << ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first+1] << " ";
+                // cout << ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first] << endl;
+            }
+            if(i ==  0){
+                ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first] = (ori_image[(corner_2.second+i-1)*imageWidth+j+corner_2.first]+scaled_sub_img_2[(i+sub_2_tl_y+2)*sub_2_width+j+sub_2_tl_x+1])/2;
+            }
+            if(i ==  159){
+                ori_image[(corner_2.second+i)*imageWidth+j+corner_2.first] = (ori_image[(corner_2.second+i+1)*imageWidth+j+corner_2.first]+scaled_sub_img_2[(i+sub_2_tl_y)*sub_2_width+j+sub_2_tl_x+1])/2;
+            }
+        
         }
     }
     
@@ -503,46 +533,25 @@ void geoTransformation::methodGEO(){
     for(int i = 0; i < 160; i++){
         for(int j = 0; j < 160; j++){
             ori_image[(corner_3.second+i)*imageWidth+j+corner_3.first] = scaled_sub_img_3[(i+sub_3_tl_y+1)*sub_3_width+j+sub_3_tl_x];
+            if(j == 0){
+                ori_image[(corner_3.second+i)*imageWidth+j+corner_3.first] = (ori_image[(corner_3.second+i)*imageWidth+j+corner_3.first-1]);
+            }
+            if(j == 159){
+                ori_image[(corner_3.second+i)*imageWidth+j+corner_3.first] = (ori_image[(corner_3.second+i)*imageWidth+j+corner_3.first+1]);
+            }
+            if(i ==  0){
+                ori_image[(corner_3.second+i)*imageWidth+j+corner_3.first] = (ori_image[(corner_3.second+i-1)*imageWidth+j+corner_3.first]);
+            }
+            if(i ==  159){
+                ori_image[(corner_3.second+i)*imageWidth+j+corner_3.first] = (ori_image[(corner_3.second+i+1)*imageWidth+j+corner_3.first]);
+            }
         }
     }
-    
-
-
-
-    unsigned char* buffer = new unsigned char[512*512];
-    for(long i = 0; i < 512*512; i++){
-        buffer[i] = ori_image[i];
+ 
+    for(long i = 0; i < imageHeight*imageWidth; i++){
+        outputBuffer[i] = (unsigned char)ori_image[i];
     }
-    FILE *file;
-    file = fopen("try.raw","wb");
-    if(file == NULL){
-        cout << "Error opening file: try.raw" << endl;
-        exit(EXIT_FAILURE);
-    }else{
-        fwrite(buffer, sizeof(unsigned char), 512*512, file);
-    }
-    fclose(file);
-
-
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // Private function define here 
 /**
