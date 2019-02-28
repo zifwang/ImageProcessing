@@ -13,7 +13,7 @@ class thinning : public morphology{
 public:
     void methodThinning(){
         // Declare a tmpImage pointer 
-        int* tmpImage = getOriImage();
+        int* tmpImage = getOriImage_0_1();
 
         cout << "Finish normalize image" << endl;
         
