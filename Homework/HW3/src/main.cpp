@@ -11,6 +11,7 @@
 #include "defectDetection.h"
 #include "objectAnalysis.h"
 #include "geoTransformation.h"
+#include "lensUndistortion.h"
 
 using namespace std;
 
@@ -68,11 +69,16 @@ int main(int argc, char** argv){
         imageData.setOutputImage(geoModifiedImg.output(),geoModifiedImg.getImageSize_gray()); 
         imageData.writeImage(geoModifiedImg.getImageSize_gray()); 
     }
-    
-
-
-
-    
+    else if(flags.algorithm == "SpatialWarp"){
+        cout << "DO" << endl;
+    }
+    else if(flags.algorithm == "LensUndistortion"){
+        lensUndistortion lenModImg;
+        lenModImg.init_image(imageData);
+        lenModImg.lens_distortion_correction(600,600);
+        imageData.setOutputImage(lenModImg.output(),lenModImg.getImageSize_gray()); 
+        imageData.writeImage(lenModImg.getImageSize_gray()); 
+    }
     else{
         cout << "Error: the input algorithm is not found." << endl;
         exit(EXIT_FAILURE);
