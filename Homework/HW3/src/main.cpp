@@ -20,11 +20,6 @@ int main(int argc, char** argv){
     FlagOptions flags = parse_flags(argc,argv);
     image imageData = image(flags);
     
-    // skeletonzing sktImg;
-    // sktImg.init_image(imageData);
-    // sktImg.methodSkeletonzing();
-    // imageData.setOutputImage(sktImg.output(),sktImg.getImageSize_gray()); 
-    // imageData.writeImage(sktImg.getImageSize_gray()); 
     if(flags.algorithm == "Shrink" || flags.algorithm == "Thin" || flags.algorithm == "Skeletonzie"){
         morphology morphoImg;
         morphoImg.init_image(imageData);
@@ -70,7 +65,7 @@ int main(int argc, char** argv){
         imageData.writeImage(geoModifiedImg.getImageSize_gray()); 
     }
     else if(flags.algorithm == "SpatialWarp"){
-        cout << "DO" << endl;
+        cout << "Matlab" << endl;
     }
     else if(flags.algorithm == "LensUndistortion"){
         lensUndistortion lenModImg;
