@@ -16,6 +16,7 @@
 #include <utility>
 #include <vector>
 #include <math.h>
+#include <map>
 #include "morphology.h"
 #include "image.h"
 
@@ -29,16 +30,44 @@ public:
         unsigned char* shrinkImageOut = new unsigned char[getImageSize_gray()];
         int* thinImage = new int[getImageSize_gray()];
         preproImage = preprocessImage();
+        for(long i = 0; i < getImageSize_gray(); i++){
+            shrinkImageOut[i] = (unsigned char)preproImage[i]*255;
+        }
+
+        FILE *file_pre; 
+        if(!(file_pre = fopen("out_rice_after_preprocessing.raw","wb"))){
+            cout << "Cannot open file: out_rice_after_preprocessing.raw." << endl;
+            exit(1);
+        }
+        fwrite(shrinkImageOut, sizeof(unsigned char), (imageHeight*imageWidth), file_pre);
+        fclose(file_pre);
         // Shrink operation
         shrinkImage = morphologyOperation(preproImage,getImageHeight(),getImageWidth(),getShrinkMark(),getShrinkThinUncondMark(),58,173);
         int countRice = 0;
-        for(int i = 0; i < imageSize_gray; i++){
-            if(shrinkImage[i] == 1){
-                countRice++;
+        map<int,pair<int,int>> position;
+        // for(int i = 0; i < imageSize_gray; i++){
+        //     if(shrinkImage[i] == 1){
+        //         countRice++;
+        //         position.push_back(make_pair());
+        //     }
+        //     shrinkImageOut[i] = (unsigned char)shrinkImage[i]*255;
+        // }
+        for(int i = 0; i < imageHeight; i++){
+            for(int j = 0; j < imageWidth; j++){
+                if(shrinkImage[i*imageWidth+j] == 1){
+                    position[countRice] = make_pair(j,i);
+                    countRice++;
+                }
+                shrinkImageOut[i*imageWidth+j] = (unsigned char)shrinkImage[i*imageWidth+j]*255;
             }
-            shrinkImageOut[i] = (unsigned char)shrinkImage[i]*255;
         }
         cout << "There are " << countRice << " grains in the image." << endl;
+        cout << "They are located at: " << endl;
+        for(int i = 0; i < countRice; i++){
+            cout << "x: " << position[i].first << ", y: " << position[i].second << endl;
+        }
+
+
         // Output shrink image
         FILE *file_shrink; 
         if(!(file_shrink = fopen("out_rice_after_Shrink.raw","wb"))){
@@ -56,54 +85,53 @@ public:
         for(int i = 0; i < imageSize_gray; i++){
             outputBuffer[i] = (unsigned char)thinImage[i]*255;
         }
-        cout << "Position Print" << endl;
-        // Vector to contains grains
-        vector<vector<pair<int,int>>> grains;
-        // bool
-        bool hit = false;
+        // cout << "Position Print" << endl;
+        // // Vector to contains grains
+        // vector<vector<pair<int,int>>> grains;
+        // // bool
+        // bool hit = false;
 
-        for(int i = 0; i < imageHeight; i++){
-            for(int j = 0; j < imageWidth; j++){
-                if(thinImage[i*imageWidth+j] == 1){
-                    // cout << "x: "<< j << ", y: " << i << endl;
-                    hit = false;
-                    coordinate = make_pair(j,i);
-                    // cout << "Grains.size: "<< grains.size() << endl;
-                    for(int k = 0; k < grains.size(); k++){
-                        vector<pair<int,int>> tmpPositionVec = grains[k];
-                        // cout << "tmpPosition.size: " << tmpPositionVec.size() << endl;
-                        for(int z = 0; z < tmpPositionVec.size(); z++){
-                            if(abs(tmpPositionVec[z].first-j) < 12 && abs(tmpPositionVec[z].second-i) < 12){
-                                // cout << tmpPositionVec[z].first-j << " " << tmpPositionVec[z].second-i << endl;
-                                tmpPositionVec.push_back(coordinate);
-                                grains[k] = tmpPositionVec;
-                                hit = true;
-                                break;
-                            }
-                        }
-                        if(hit == true) break;
-                    }
-                    // cout << "hit: "<< hit << endl;
-                    if(hit != true){
-                        vector<pair<int,int>> tmpPositionVec_2;
-                        tmpPositionVec_2.push_back(coordinate);
-                        grains.push_back(tmpPositionVec_2);
-                        // cout << "Init Vector" << endl;
-                    }
+        // for(int i = 0; i < imageHeight; i++){
+        //     for(int j = 0; j < imageWidth; j++){
+        //         if(thinImage[i*imageWidth+j] == 1){
+        //             // cout << "x: "<< j << ", y: " << i << endl;
+        //             hit = false;
+        //             coordinate = make_pair(j,i);
+        //             // cout << "Grains.size: "<< grains.size() << endl;
+        //             for(int k = 0; k < grains.size(); k++){
+        //                 vector<pair<int,int>> tmpPositionVec = grains[k];
+        //                 // cout << "tmpPosition.size: " << tmpPositionVec.size() << endl;
+        //                 for(int z = 0; z < tmpPositionVec.size(); z++){
+        //                     if(abs(tmpPositionVec[z].first-j) < 12 && abs(tmpPositionVec[z].second-i) < 12){
+        //                         // cout << tmpPositionVec[z].first-j << " " << tmpPositionVec[z].second-i << endl;
+        //                         tmpPositionVec.push_back(coordinate);
+        //                         grains[k] = tmpPositionVec;
+        //                         hit = true;
+        //                         break;
+        //                     }
+        //                 }
+        //                 if(hit == true) break;
+        //             }
+        //             // cout << "hit: "<< hit << endl;
+        //             if(hit != true){
+        //                 vector<pair<int,int>> tmpPositionVec_2;
+        //                 tmpPositionVec_2.push_back(coordinate);
+        //                 grains.push_back(tmpPositionVec_2);
+        //                 // cout << "Init Vector" << endl;
+        //             }
 
-                }
-            }
-        }
-        cout << "Finish catgorize" << endl;
-        cout <<  grains.size() << endl;
-        for(int i = 0; i < grains.size(); i++){
-            vector<pair<int,int>> tmpPositionVec = grains[i];
-            cout << "Grain " << i << ": "<< endl;
-            for(int j = 0; j < tmpPositionVec.size(); j++){
-                cout << "x: " << tmpPositionVec[j].first << ", y: " << tmpPositionVec[j].second << endl;
-            }
-        }
-        // need to find a way to calculate the long axis.
+        //         }
+        //     }
+        // }
+        // cout << "Finish catgorize" << endl;
+        // cout <<  grains.size() << endl;
+        // for(int i = 0; i < grains.size(); i++){
+        //     vector<pair<int,int>> tmpPositionVec = grains[i];
+        //     cout << "Grain " << i << ": "<< endl;
+        //     for(int j = 0; j < tmpPositionVec.size(); j++){
+        //         cout << "x: " << tmpPositionVec[j].first << ", y: " << tmpPositionVec[j].second << endl;
+        //     }
+        // }
 
         delete[] thinImage;
         delete[] preproImage;

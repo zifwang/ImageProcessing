@@ -68,6 +68,10 @@ public:
             coordinate = mainBodyDefects[i];
             tmpImage[coordinate.first*imageWidth+coordinate.second] = 1;
         }
+        for(int i = 0; i < boundaryHoles.size(); i++){
+            coordinate = boundaryHoles[i];
+            tmpImage[coordinate.first*imageWidth+coordinate.second] = 1;
+        }
 
         // Set ouput image
         for(int i = 0; i < imageSize_gray; i++){

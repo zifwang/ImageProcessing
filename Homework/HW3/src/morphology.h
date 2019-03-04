@@ -163,13 +163,17 @@ public:
                     tmpImage[i*imageWidth+j] = stageTwo[i*imageWidth+j];
                 }
             }
-            cout << "Difference between preivous and now is: " << difference << endl;
+            // cout << "Difference between preivous and now is: " << difference << endl;
             if(difference != 0){
                 isUpdate = true;
             }else{
                 isUpdate = false;
             }
-            cout << "Finish iteration: " << to_string(iter) << endl;
+            // cout << "Finish iteration: " << to_string(iter) << endl;
+
+            // if(iter == 10){
+            //     break;
+            // }
         }
         return tmpImage;
     }
