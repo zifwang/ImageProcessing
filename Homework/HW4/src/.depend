@@ -1,0 +1,6 @@
+flags.o: flags.cpp flags.h
+image.o: image.cpp image.h flags.h
+textureClassification.o: textureClassification.cpp \
+ textureClassification.h flags.h
+textureSegmentation.o: textureSegmentation.cpp textureSegmentation.h \
+ flags.h
