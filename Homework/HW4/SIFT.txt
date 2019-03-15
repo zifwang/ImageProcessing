@@ -1,0 +1,19 @@
+﻿Lowe, David G. "Object recognition from local scale-invariant features." iccv. Ieee, 1999.
+
+I. From the paper abstract, the SIFT is robust to what geometric modifications?
+	The SIFT proposed by David is robust to translation, scaling, and rotation. In addition, it is partially robust to affine or 3D projection.
+II. How does SIFT achieves its robustness to each of them?
+	Translation: 
+		Early researches about detecting features were robust in translation. They adopted corner detectors to extract key features. The SIFT algorithm constructs a set of progressively Gaussian blurred images and then takes differences to get a difference of Gaussian (DoG) pyramid. Determine the keypoints from finding local extrema in the DoG pyramid.
+	Scaling:
+		Changing in scale of images will cause feature detection fail in the previous researches. However, the SIFT algorithm achieves scaling invariant by building DoG pyramid and finding local minima and maxima in these pyramid to determine keypoints.
+	Rotation:
+		The invariance of rotation achieves by creating a scale space of images (construct a set of progressively Gaussian blurred images and take differences to get a DoG pyramid) and then finding  local extrema in this scale-space to determine features.
+III. How does SIFT enhances its robustness to illumination change?
+	To enhance the robustness of illumination change, the SIFT algorithm sets thresholding value at 0.1  maximum possible gradient value which is calculated by taking derivative of DoG pyramid to determine possible features.
+IV. What are the advantages that SIFT uses difference of Gaussians (DoG) instead of
+Laplacian of Gaussians (LoG)?
+	First, the Laplacian of Gaussian images are not scale invariant. The sigma^2 in the demonimator is  scale. We will get scale independence by removing sigma^2. The difference of Gaussian adopts this idea to remove scaling effects.
+	Second,  the difference of Gaussian images are approximately same to the Laplacian of Gaussian. Also, DoG is less computationally intensive than LoG.
+V. What is the SIFT’s output vector size in its original paper?
+	There are 30,000 key vectors in the paper.
