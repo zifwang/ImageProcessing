@@ -1,3 +1,5 @@
+main.o: main.cpp flags.h image.h textureClassification.h \
+ textureSegmentation.h SIFT_Experiment.h bagofWords.h
 flags.o: flags.cpp flags.h
 image.o: image.cpp image.h flags.h
 textureClassification.o: textureClassification.cpp \

@@ -1,6 +1,6 @@
 /**
  * Author: Zifan Wang
- * HW3: Geo and Morphological
+ * HW4
  */ 
 #include <iostream>
 #include <stdio.h>
@@ -13,9 +13,10 @@
 #include "image.h"
 #include "textureClassification.h"
 #include "textureSegmentation.h"
+#include "SIFT_Experiment.h"
+#include "bagofWords.h"
 
 using namespace std;
-using namespace cv;
 
 int main(int argc, char** argv){
     // Flag parse
@@ -28,9 +29,14 @@ int main(int argc, char** argv){
         textureSegmentation ts = textureSegmentation(flags);
         ts.methodSegmentation();
     }
-    // else if(flags.algorithm == "SIFT"){
-
-    // }
+    else if(flags.algorithm == "SIFT"){
+        sift siftExp = sift(flags);
+        siftExp.methodSIFT(2);      // input argument: threshold of keypoints 
+    }
+    else if(flags.algorithm == "BOW"){
+        bow bowExp = bow(flags);
+        bowExp.methodBOW();
+    }
 
 
     return 0;

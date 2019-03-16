@@ -55,6 +55,16 @@ FlagOptions parse_flags(int argc, char** argv){
                 flags.imageHeight = atoi(argv[4]);
                 flags.imageWidth = atoi(argv[5]);
                 flags.BytesPerPixel = atoi(argv[6]);
+                if(argv[3] == "BOW"){
+                    if(argc < 9){
+                        cout << "Syntax Error - Incorrect Parameter Usage:" << endl;
+                        print_usage();
+                        exit(EXIT_FAILURE);
+                    }else{
+                        flags.numClassofTraining = atoi(argv[7]);
+                        flags.numImgPerClass = atoi(argv[8]);
+                    }
+                }
             }
         }
     }

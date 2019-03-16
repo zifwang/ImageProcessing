@@ -15,6 +15,8 @@ struct FlagOptions{
     int imageHeight;
     int imageWidth;
     int BytesPerPixel;
+    int numClassofTraining;
+    int numImgPerClass;
 };
 
 /** 

@@ -100,7 +100,7 @@ double textureSegmentation::getPixelEnergy(double* image, int height, int width,
     }
     // cout << endl;
     
-    return sum/(height*width);
+    return sum/(windowsSize*windowsSize);
 }
 
 
@@ -130,7 +130,7 @@ void textureSegmentation::methodSegmentation(){
 
     // pixel energy
     Mat pixelEnergy(imageHeight*imageWidth,laws_filters_bank.size(),CV_32F);
-    int windowsSize = 5;
+    int windowsSize = 20;
     for(int i = 0; i < laws_filters_bank.size(); i++){
         // cout << i << endl;
         vector<double> image = imageMap[i];
@@ -151,10 +151,11 @@ void textureSegmentation::methodSegmentation(){
     
     // Kmeans
     Mat labels, centers;
-    kmeans(pixelEnergy, 7, labels, TermCriteria( CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 10, 0.0001 ), 5, KMEANS_RANDOM_CENTERS, centers);
+    kmeans(pixelEnergy, 7, labels, TermCriteria( CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 1000, 0.0001 ), 1000, KMEANS_RANDOM_CENTERS, centers);
     // matSave(labels,imageHeight,imageWidth,"labels.txt");
     // Set output image
     double* outputImage = new double[imageHeight*imageWidth];
+    Mat imgOut(imageHeight,imageWidth,CV_8UC1);
     for(int i = 0; i < imageHeight; i++){
 		for(int j = 0; j < imageWidth; j++){
             double pixelVal;
@@ -180,9 +181,11 @@ void textureSegmentation::methodSegmentation(){
                 pixelVal = 255;
             }
             outputImage[i*imageWidth+j] = pixelVal;
+            imgOut.at<unsigned char>(i,j) = (unsigned char) pixelVal;
 		}
 	}
-    saveImage(outputImage, imageHeight, imageWidth, 1, outputFilename);
+    imwrite(outputFilename,imgOut);
+    // saveImage(outputImage, imageHeight, imageWidth, 1, outputFilename);
 }
 
 // Save array into txt file.
