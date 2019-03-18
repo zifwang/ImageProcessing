@@ -145,6 +145,7 @@ public:
         setFeatureDescriptor();
         // Cluster the feature vectors
         Mat dictionary = trainer.cluster(featuresUnclustered);
+        // cout << dictionary.rows << " " << dictionary.cols << endl;
 
         // // create a nearest neighbor matcher
         // Ptr<DescriptorMatcher> matcher = DescriptorMatcher::create("FlannBased");
@@ -198,15 +199,14 @@ public:
             }	
             histCount[index] += 1;
         }
-        
-        
+
         ofstream txtOut;
         txtOut.open("his.txt");
         int max = 0;
         int indexClass = 0;
         if(txtOut.is_open()){
             for(size_t i = 0; i < dictionary.rows; i++){
-                // cout << histCount[i] << endl;
+                cout << histCount[i] << endl;
                 txtOut << histCount[i] << " ";
                 if(max < histCount[i]){ 
                     max = histCount[i];

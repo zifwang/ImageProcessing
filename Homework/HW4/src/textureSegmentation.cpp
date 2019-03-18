@@ -128,6 +128,7 @@ void textureSegmentation::methodSegmentation(){
         }
     }
 
+    cout << "Start getting pixel energy.........." << endl;
     // pixel energy
     Mat pixelEnergy(imageHeight*imageWidth,laws_filters_bank.size(),CV_32F);
     int windowsSize = 20;
@@ -147,11 +148,13 @@ void textureSegmentation::methodSegmentation(){
             }
         }
     }
+    cout << "Finish getting pixel energy!" << endl;
+    
     // matSaveOri(pixelEnergy, imageHeight*imageWidth,laws_filters_bank.size(), "pixelenergy.txt");
     
     // Kmeans
     Mat labels, centers;
-    kmeans(pixelEnergy, 7, labels, TermCriteria( CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 1000, 0.0001 ), 1000, KMEANS_RANDOM_CENTERS, centers);
+    kmeans(pixelEnergy, 7, labels, TermCriteria( CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 1000, 0.0001 ), 500, KMEANS_RANDOM_CENTERS, centers);
     // matSave(labels,imageHeight,imageWidth,"labels.txt");
     // Set output image
     double* outputImage = new double[imageHeight*imageWidth];
