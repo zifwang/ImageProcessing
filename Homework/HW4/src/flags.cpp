@@ -16,17 +16,17 @@ void print_usage(){
         " 2.outputImage: image name want to output with correct path, default to current directory\n"
         " 3.algorithm:\n"
         "        The algorithms can be used in this program. Valid values are:\n"
-        "            Shrink: Shrink the Input Image\n"
-        "            Thin: Thin the Input Image\n"
-        "            Skeletonzie: Skeletonzie The Input Image\n"
-        "            DetectionDefect: Detect the main body defects and remove defects\n"
-        "            ObjectAnalysis: Rice Analysis\n"
-        "            GeoTransformation: Fill the light house images\n"
-        "            LensUndistortion: Recover lens distorted images\n"
+        "            TC: Texture Classification\n"
+        "            TS: Texture Segmentation\n"
+        "            SIFT: SIFT Image Matching\n"
+        "            BOW: Bag of Words Digit Classification\n"
         " 4.imageHeight: height of image\n"
         " 5.imageWidth: width of image\n"
         " 6.BytesPerPixel: color image: BytesPerPixel = 3, \n"
-        "                  gray scale image: BytesPerPixel = 1\n";
+        "                  gray scale image: BytesPerPixel = 1\n"
+        " 7.numClass: number of training class(only use when algorithm = BOW)\n"
+        " 8.numImagePerClass: number of training images per class(only use when algorithm = BOW)\n";
+
 }
 
 FlagOptions parse_flags(int argc, char** argv){
