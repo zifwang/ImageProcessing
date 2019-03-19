@@ -190,12 +190,12 @@ void textureClassification::methodClassification(){
     // Step 6: K-means
     // 25D
     Mat labels_25, centers_25;
-    kmeans(featureVectors_mat,4,labels_25,TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 0.01),1,KMEANS_RANDOM_CENTERS,centers_25);
+    kmeans(featureVectors_mat,4,labels_25,TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 40, 0.01),1,KMEANS_RANDOM_CENTERS,centers_25);
     cout << "25D: " << endl;
     cout << labels_25 << endl;
     
     Mat labels_3, centers_3;
-    kmeans(projectTo3D,4,labels_3,TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 10, 0.01),1,KMEANS_RANDOM_CENTERS,centers_3);
+    kmeans(projectTo3D,4,labels_3,TermCriteria( TermCriteria::EPS+TermCriteria::COUNT, 40, 0.01),1,KMEANS_RANDOM_CENTERS,centers_3);
     cout << "3D: " << endl;
     cout << labels_3 << endl;
 

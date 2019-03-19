@@ -175,29 +175,29 @@ public:
         
         double tempD = 0, temp = 0; 
         int index = 0;
-        int histCount[dictionary.rows];
-        double euclideanD[dictionary.rows]; 
+        int countHist[dictionary.rows];
+        double ED[dictionary.rows]; 
         for (int i = 0; i < dictionary.rows;i++) {
-            histCount[i] = 0;
+            countHist[i] = 0;
         }
         for (int i = 0; i < descriptor.rows; i++) {
             for (int k = 0; k < dictionary.rows;k++) {
                 for (int j = 0; j < descriptor.cols; j++) {
                     tempD += ((descriptor.at<float>(i,j)-dictionary.at<float>(k,j))*(descriptor.at<float>(i, j) - dictionary.at<float>(k, j)));
                 }
-                euclideanD[k] = (sqrt(tempD));
+                ED[k] = (sqrt(tempD));
                 tempD = 0.0;
             }
-            temp = euclideanD[0]; 
+            temp = ED[0]; 
             index = 0;
 
             for (int k = 1; k<dictionary.rows; k++) {
-                if (temp>euclideanD[k]) {
-                    temp = euclideanD[k];
+                if (temp>ED[k]) {
+                    temp = ED[k];
                     index = k;
                 }
             }	
-            histCount[index] += 1;
+            countHist[index] += 1;
         }
 
         ofstream txtOut;
@@ -206,10 +206,10 @@ public:
         int indexClass = 0;
         if(txtOut.is_open()){
             for(size_t i = 0; i < dictionary.rows; i++){
-                cout << histCount[i] << endl;
-                txtOut << histCount[i] << " ";
-                if(max < histCount[i]){ 
-                    max = histCount[i];
+                cout << countHist[i] << endl;
+                txtOut << countHist[i] << " ";
+                if(max < countHist[i]){ 
+                    max = countHist[i];
                     indexClass = i;
                 }
             }

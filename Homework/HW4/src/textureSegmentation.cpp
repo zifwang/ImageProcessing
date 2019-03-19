@@ -131,7 +131,7 @@ void textureSegmentation::methodSegmentation(){
     cout << "Start getting pixel energy.........." << endl;
     // pixel energy
     Mat pixelEnergy(imageHeight*imageWidth,laws_filters_bank.size(),CV_32F);
-    int windowsSize = 20;
+    int windowsSize = 30;
     for(int i = 0; i < laws_filters_bank.size(); i++){
         // cout << i << endl;
         vector<double> image = imageMap[i];
@@ -148,13 +148,28 @@ void textureSegmentation::methodSegmentation(){
             }
         }
     }
+    // normalize pixel energy 
+    for(size_t i = 0; i < imageHeight*imageWidth; i++){
+        for(int j = 0; j < laws_filters_bank.size(); j++){
+            pixelEnergy.at<float>(i,j) = pixelEnergy.at<float>(i,j)/pixelEnergy.at<float>(i,0);
+        }
+    }
+
     cout << "Finish getting pixel energy!" << endl;
     
     // matSaveOri(pixelEnergy, imageHeight*imageWidth,laws_filters_bank.size(), "pixelenergy.txt");
     
+    // perform pca
+    cv::PCA pca_analysis(pixelEnergy,cv::Mat(),CV_PCA_DATA_AS_ROW,3);
+    cv::Mat projectTo3D = pca_analysis.project(pixelEnergy);
+
+
     // Kmeans
     Mat labels, centers;
-    kmeans(pixelEnergy, 7, labels, TermCriteria( CV_TERMCRIT_ITER|CV_TERMCRIT_EPS, 1000, 0.0001 ), 500, KMEANS_RANDOM_CENTERS, centers);
+    // PCA
+    kmeans(projectTo3D, 7, labels, TermCriteria(TermCriteria::EPS+TermCriteria::COUNT, 1000, 0.001 ), 2, KMEANS_RANDOM_CENTERS, centers);
+    // no PCA
+    // kmeans(pixelEnergy, 7, labels, TermCriteria(TermCriteria::EPS+TermCriteria::COUNT, 1000, 0.001 ), 2, KMEANS_RANDOM_CENTERS, centers);
     // matSave(labels,imageHeight,imageWidth,"labels.txt");
     // Set output image
     double* outputImage = new double[imageHeight*imageWidth];

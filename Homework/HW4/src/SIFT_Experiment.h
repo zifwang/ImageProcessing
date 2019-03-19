@@ -154,6 +154,11 @@ public:
         extractorSIFT->compute(image_1,keypointsSIFT_1,SiftDescriptor_image1);
         extractorSIFT->compute(image_2,keypointsSIFT_2,SiftDescriptor_image2);
 
+        // cout << SiftDescriptor_image1.rows << endl;          // 8786
+        // cout << SiftDescriptor_image1.cols << endl;          // 128
+        // cout << SiftDescriptor_image2.rows << endl;          // 9384
+        // cout << SiftDescriptor_image2.cols << endl;          // 128
+
         // Find match
         BFMatcher match;
         vector<DMatch> matchSIFT;
@@ -176,6 +181,9 @@ public:
         Mat imageOut;
         drawMatches(image_1,keypointsSIFT_1,image_2,keypointsSIFT_2,good_match,imageOut, Scalar::all(-1), Scalar::all(-1), vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
         imwrite(outputFilename,imageOut);
+
+        
+
     }
 
 
