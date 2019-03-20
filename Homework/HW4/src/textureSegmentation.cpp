@@ -111,8 +111,29 @@ void textureSegmentation::methodSegmentation(){
     for(size_t i = 0; i < imageHeight*imageWidth; i++){
         inputImage[i] = double(inputBuffer[i]);
     }
+    double* extentedImage_tmp = new double[(imageHeight+11*2)+(imageWidth+11*2)];
+    extentedImage_tmp = padding(inputImage,imageHeight,imageWidth,11);
+
+    // local mean reduction
+    double* imageTmp = new double[imageHeight*imageWidth];
+    for(int i = 0; i < imageHeight; i++){
+        for(int j = 0; j < imageWidth; j++){
+            double average = 0;
+            int count = 0;
+            for(int fi = -5; fi <= 5; fi++){
+                for(int fj = -5; fj <= 5; fj++){
+                    average += extentedImage_tmp[(i+11+fi)*(imageWidth+11*2)+(j+11+fj)];
+                    count++;
+                }
+            }
+            imageTmp[i*imageWidth+j] = extentedImage_tmp[(i+11)*(imageWidth+11*2)+(j+11)] - average/count;
+        }
+    }
+    saveImage(imageTmp, imageHeight, imageWidth, 1, "test.raw");
+
     double* extentedImage = new double[(imageHeight+5*2)+(imageWidth+5*2)];
-    extentedImage = padding(inputImage,imageHeight,imageWidth,5);
+    extentedImage = padding(imageTmp,imageHeight,imageWidth,5);
+
 
     // store 25 image
     map<int,vector<double>> imageMap;
@@ -131,7 +152,7 @@ void textureSegmentation::methodSegmentation(){
     cout << "Start getting pixel energy.........." << endl;
     // pixel energy
     Mat pixelEnergy(imageHeight*imageWidth,laws_filters_bank.size(),CV_32F);
-    int windowsSize = 30;
+    int windowsSize = 20;
     for(int i = 0; i < laws_filters_bank.size(); i++){
         // cout << i << endl;
         vector<double> image = imageMap[i];
