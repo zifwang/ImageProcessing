@@ -33,7 +33,7 @@ def load_data_mnist():
 
     return X_train, Y_train, X_test, Y_test
 
-def Model(cnnModel,input_size):
+def buildModel(cnnModel,input_size):
     """
         Function to build my network
         Arguments: keras cnnModel & input_size: image size
@@ -66,7 +66,7 @@ if __name__ == "__main__":
     x_train, y_train, x_test, y_test = load_data_mnist()
     # Build model
     model = Sequential()
-    model = Model(model,(28,28,1))
+    model = buildModel(model,(28,28,1))
     # Display model setting
     print(model.summary())
 
