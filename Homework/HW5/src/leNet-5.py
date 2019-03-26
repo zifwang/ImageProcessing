@@ -1,7 +1,6 @@
 """
     Author: Zifan Wang
     Train LeNet-5 using MNIST Dataset
-    Using Optimization: Adam, Activation Function: Relu, No Regularizers
 """
 
 import numpy as np
@@ -117,7 +116,7 @@ plt.show()
 
 
 # Save Model
-myModel.save('model_adam_relu.h5')
+myModel.save('model.h5')
 print('Save Model to Disk')
 
 # Test Set Accuracy
