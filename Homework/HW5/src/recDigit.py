@@ -43,20 +43,17 @@ def buildModel(cnnModel,input_size):
     cnnModel.add(Conv2D(filters = 32, kernel_size=(3,3), strides=(1,1), padding='same', activation='relu', input_shape = input_size))
     cnnModel.add(MaxPooling2D(pool_size=(2,2)))
     cnnModel.add(Conv2D(filters = 64, kernel_size=(3,3), strides=(1,1), padding='same', activation='relu'))
-    cnnModel.add(Conv2D(filters = 64, kernel_size=(3,3), strides=(1,1), padding='same', activation='relu'))
+    cnnModel.add(Conv2D(filters = 64, kernel_size=(3,3), strides=(1,1), padding='same', activation='relu', kernel_regularizer=regularizers.l2(0.0001)))
     cnnModel.add(MaxPooling2D(pool_size=(2,2)))
     # Fully Connected Layer
     cnnModel.add(Flatten())
-    cnnModel.add(Dense(128))
-    cnnModel.add(Activation('relu'))
-    cnnModel.add(Dense(64))
-    cnnModel.add(Activation('relu'))
-    cnnModel.add(Dense(32))
-    cnnModel.add(Activation('relu'))
+    cnnModel.add(Dense(128,activation='relu',kernel_regularizer=regularizers.l2(0.0001)))
+    cnnModel.add(Dense(64,activation='relu',kernel_regularizer=regularizers.l2(0.0001)))
+    cnnModel.add(Dense(32,activation='relu',kernel_regularizer=regularizers.l2(0.0001)))
     cnnModel.add(Dense(10))
     cnnModel.add(Activation('softmax'))
 
-    cnnModel.compile(optimizer='RMSprop',loss='categorical_crossentropy',metrics=['accuracy'])
+    cnnModel.compile(optimizer='Adam',loss='categorical_crossentropy',metrics=['accuracy'])
 
     return cnnModel
 
@@ -73,7 +70,7 @@ if __name__ == "__main__":
     hist = model.fit(x=x_train,
           y=y_train, 
           batch_size=32, 
-          epochs=20, 
+          epochs=10, 
           verbose=1,
           validation_split=0.1,
           shuffle=True
@@ -107,3 +104,16 @@ if __name__ == "__main__":
     score = model.evaluate(x_test,y_test,verbose=1)
     print('Test Loss: ', score[0])
     print('Test Accuracy: ', score[1])
+
+    """
+    Epoch 10/10
+    108000/108000 [==============================] - 18s 164us/step - loss: 0.0507 - acc: 0.9930 - val_loss: 0.0629 - val_acc: 0.9895
+    Mean training accuracy:  0.9854157407407407
+    Mean validation accuracy:  0.9869833333333332
+    Variance training accuracy:  0.00017064911608367662
+    Variance validation accuracy:  1.8226111111111083e-05
+    Save Model to Disk
+    20000/20000 [==============================] - 1s 49us/step
+    Test Loss:  0.06454014147222042
+    Test Accuracy:  0.98945
+    """
