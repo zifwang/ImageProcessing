@@ -7,6 +7,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import keras 
+from keras import optimizers
 from keras.datasets import mnist
 from keras.models import Sequential, Model
 from keras.layers import Input
@@ -80,8 +81,9 @@ y_train = keras.utils.to_categorical(y_train,10)    # Ten class: 0-9. change fro
 x_test = x_test.reshape(10000, 28, 28, 1)
 y_test = keras.utils.to_categorical(y_test,10)
 
-myModel = leNet5_model((28,28,1),'random_uniform',True)        # Changeble
-myModel.compile(optimizer='RMSprop',loss='categorical_crossentropy',metrics=['accuracy'])
+myModel = leNet5_model((28,28,1),'random_uniform',False)        # Changeble
+sgd = optimizers.SGD(lr=0.001, decay=1e-6, momentum=0.9, nesterov=True)
+myModel.compile(optimizer=sgd,loss='categorical_crossentropy',metrics=['accuracy'])
 
 # Display model Summary
 print(myModel.summary())
@@ -89,7 +91,7 @@ print(myModel.summary())
 hist = myModel.fit(x=x_train,
           y=y_train, 
           batch_size=32, 
-          epochs=20, 
+          epochs=15, 
           verbose=1,
           validation_split=0.1,
           shuffle=True
@@ -123,6 +125,69 @@ print('Save Model to Disk')
 score = myModel.evaluate(x_test,y_test,verbose=1)
 print('Test Loss: ', score[0])
 print('Test Accuracy: ', score[1])
+
+
+"""
+1. 0.001_false_true
+54000/54000 [==============================] - 5s 97us/step - loss: 0.0109 - acc: 0.9990 - val_loss: 0.0533 - val_acc: 0.9900
+Mean training accuracy:  0.9902716049382717
+Mean validation accuracy:  0.9877777777777778
+Variance training accuracy:  0.00016850693491845785
+Variance validation accuracy:  1.1835802469135698e-05
+Save Model to Disk
+10000/10000 [==============================] - 0s 32us/step
+Test Loss:  0.04078451611176133
+Test Accuracy:  0.991
+
+2. 0.001_true_true
+54000/54000 [==============================] - 5s 100us/step - loss: 0.0146 - acc: 0.9974 - val_loss: 0.0564 - val_acc: 0.9910
+Mean training accuracy:  0.9895814814814815
+Mean validation accuracy:  0.9875444444444443
+Variance training accuracy:  0.0001960108276177408
+Variance validation accuracy:  6.51654320987657e-06
+Save Model to Disk
+10000/10000 [==============================] - 0s 33us/step
+Test Loss:  0.054514804042875765
+Test Accuracy:  0.9875
+
+3. 0.01_true_true
+54000/54000 [==============================] - 5s 99us/step - loss: 2.3317 - acc: 0.1120 - val_loss: 2.3333 - val_acc: 0.1050
+Mean training accuracy:  0.1910098765432099
+Mean validation accuracy:  0.16215555555555555
+Variance training accuracy:  0.0463308769943606
+Variance validation accuracy:  0.045015983209876556
+Save Model to Disk
+10000/10000 [==============================] - 0s 33us/step
+Test Loss:  2.3311051441192627
+Test Accuracy:  0.1135
+
+4. 0.0001_true_true
+54000/54000 [==============================] - 5s 100us/step - loss: 0.0364 - acc: 0.9907 - val_loss: 0.0619 - val_acc: 0.9837
+Mean training accuracy:  0.9738419753086418
+Mean validation accuracy:  0.980811111111111
+Variance training accuracy:  0.0007700460387136106
+Variance validation accuracy:  5.729950617283946e-05
+Save Model to Disk
+10000/10000 [==============================] - 0s 35us/step
+Test Loss:  0.0545536430940032
+Test Accuracy:  0.9843
+
+5. 0.001_true_false
+54000/54000 [==============================] - 5s 95us/step - loss: 0.0081 - acc: 0.9974 - val_loss: 0.0617 - val_acc: 0.9877
+Mean training accuracy:  0.9895382716049383
+Mean validation accuracy:  0.9859444444444444
+Variance training accuracy:  0.00015771209266880027
+Variance validation accuracy:  1.251728395061725e-05
+Save Model to Disk
+10000/10000 [==============================] - 0s 31us/step
+Test Loss:  0.039339677639823274
+Test Accuracy:  0.9903
+"""
+
+
+
+
+
 
 """
 SGD without kernelRegularizer:
