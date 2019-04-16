@@ -30,7 +30,7 @@ Problem 1:
         Function: Texture Segmentation
         Run Code: 
         make
-        ./HW4 image_ori.raw out.raw GeoTransformation ImageHeight ImageWidth Byte_per_pixel
+        ./HW4 image_ori.raw out.raw TS ImageHeight ImageWidth Byte_per_pixel
     
     C. Advanced Texture Segmentation:
         File name: textureSegmentation.cpp/h.
@@ -39,7 +39,7 @@ Problem 1:
         Function: Texture Segmentation
         Run Code: 
         make
-        ./HW4 image_ori.raw out.raw GeoTransformation ImageHeight ImageWidth Byte_per_pixel
+        ./HW4 image_ori.raw out.raw TS ImageHeight ImageWidth Byte_per_pixel
 
 Problem 2:
 

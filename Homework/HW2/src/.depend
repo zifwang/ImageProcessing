@@ -1,6 +1,0 @@
-main.o: main.cpp flags.h image.h RT.h half_tonning_algorithm.h DM.h \
- errorDiffusion.h separableErrorDiffusion.h MBVQ.h sobelEdgeDetector.h
-flags.o: flags.cpp flags.h
-image.o: image.cpp image.h flags.h
-sobelEdgeDetector.o: sobelEdgeDetector.cpp sobelEdgeDetector.h image.h \
- flags.h

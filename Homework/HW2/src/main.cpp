@@ -124,6 +124,5 @@ void cannyEdgeDetection(FlagOptions flags){
     outputImage = 255 - outputImage;
     // write to image
     cv::imwrite(flags.outputFilename,outputImage);
-    cv::waitKey();
 }
 
