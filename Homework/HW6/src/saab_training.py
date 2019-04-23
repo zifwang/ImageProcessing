@@ -510,9 +510,11 @@ class saab:
 
 
         num_clusters = [120, 84, 10]
-        use_classes = 10
+        use_classes = len(classUsed)
         weights = {}
         bias = {}
+        pool = mp.Pool(mp.cpu_count())
+
         for k in range(len(num_clusters)):
             if k != len(num_clusters) - 1:
                 # Kmeans
@@ -524,6 +526,7 @@ class saab:
                         for j in range(feature.shape[0]):
                             if pred_labels[j] == i and train_labels[j] == t:
                                 num_clas[i, t] += 1
+
                 acc_train = np.sum(np.amax(num_clas, axis=1)) / feature.shape[0]
                 if(verbose):
                     print(k, ' layer Kmean (just ref) training acc is {}'.format(acc_train))
@@ -615,5 +618,6 @@ class saab:
         fw = open('llsr_bias_compact_v2.pkl', 'wb')
         pickle.dump(bias, fw, protocol=2)
         fw.close()
+
 
 
