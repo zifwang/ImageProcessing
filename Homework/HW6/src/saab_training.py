@@ -545,6 +545,9 @@ class saab:
                 t = 0
                 labels = np.zeros((feature.shape[0], num_clusters[k]), dtype=np.float32)
                 for i in range(feature.shape[0]):
+                    print(pred_labels[i])
+                    print(labels[i])
+                    print(clus_labels[pred_labels[i]])
                     if clus_labels[pred_labels[i]] == labels[i]:
                         labels[i, pred_labels[i]] = 1
                     else:
