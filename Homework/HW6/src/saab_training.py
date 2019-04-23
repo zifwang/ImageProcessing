@@ -483,14 +483,26 @@ class saab:
                 verbose: (type bool) whether to print out some messages during training process
             Returns:
         """
-        # Get kernel
-        pcaParameters = self.get_kernel_compact(images=images, labels=labels, kernelSize=kernelSize, numKernels=numKernels, energyPercent=energyPercent, numImagesUsed=numImagesUsed, classUsed=classUsed, verbose=verbose)
-        # Get sample images
-        feat = self.get_feature_compact(trainingImages=images, parameters = pcaParameters, verbose = verbose)
+        # Get feat_compact.pkl
+        exists = os.path.exists('feat_compact.pkl')
+        if not exists:
+            # Get kernel
+            pcaParameters = self.get_kernel_compact(images=images, labels=labels, kernelSize=kernelSize, numKernels=numKernels, energyPercent=energyPercent, numImagesUsed=numImagesUsed, classUsed=classUsed, verbose=verbose)
+            # Get sample images
+            feat = self.get_feature_compact(trainingImages=images, parameters = pcaParameters, verbose = verbose)
+        else:
+            # load feature
+            fr = open('feat_compact.pkl', 'rb')
+            feat = pickle.load(fr)
+            fr.close()
+        # Get feature
         feature = feat['feature']
+
         if(verbose):
             print('feature type: ', feature.dtype)
             print("S4 shape:", feature.shape)
+
+        # Reshape and move axis
         feature=feature.reshape(60000, 16, 5, 5)
         feature=np.moveaxis(feature, 1, 3)
         feature=feature.reshape(-1, 5*5*16)
