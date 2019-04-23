@@ -464,7 +464,7 @@ class saab:
 
     def get_weight_compact(self,
                            images = None,
-                           labels = None,
+                           train_labels = None,
                            kernelSize = None,
                            numKernels = None,
                            energyPercent = None,
@@ -474,7 +474,7 @@ class saab:
         """
             Arguments:
                 images: (type np) the input image dataset with shape = [numImages,imageHeight,imageWidth,imageChannel]
-                labels: (type np) the input labels corresponding to the input image with shape = [num_images]
+                train_labels: (type np) the input labels corresponding to the input image with shape = [num_images]
                 kernelSize: (type string) kernel size of each stage. the length defines how many stages conducted
                 numKernels: (type string) number of kernels for each stage. the length should be equal to kernel_size if it is set. 
                 energyPercent: (type float) the percent of energy to be kept in all PCA stages. If numKernels is set, energyPercent will be ignored
@@ -487,7 +487,7 @@ class saab:
         exists = os.path.exists('feat_compact.pkl')
         if not exists:
             # Get kernel
-            pcaParameters = self.get_kernel_compact(images=images, labels=labels, kernelSize=kernelSize, numKernels=numKernels, energyPercent=energyPercent, numImagesUsed=numImagesUsed, classUsed=classUsed, verbose=verbose)
+            pcaParameters = self.get_kernel_compact(images=images, labels=train_labels, kernelSize=kernelSize, numKernels=numKernels, energyPercent=energyPercent, numImagesUsed=numImagesUsed, classUsed=classUsed, verbose=verbose)
             # Get sample images
             feat = self.get_feature_compact(trainingImages=images, parameters = pcaParameters, verbose = verbose)
         else:
@@ -521,7 +521,7 @@ class saab:
                 for i in range(num_clusters[k]):
                     for t in range(use_classes):
                         for j in range(feature.shape[0]):
-                            if pred_labels[j] == i and labels[j] == t:
+                            if pred_labels[j] == i and train_labels[j] == t:
                                 num_clas[i, t] += 1
                 acc_train = np.sum(np.amax(num_clas, axis=1)) / feature.shape[0]
                 if(verbose):
@@ -533,7 +533,7 @@ class saab:
                 for i in range(num_clusters[k]):
                     t = 0
                     for j in range(feature.shape[0]):
-                        if pred_labels[j] == i and clus_labels[i] == labels[j]:
+                        if pred_labels[j] == i and clus_labels[i] == train_labels[j]:
                             if t == 0:
                                 feature_test = feature[j].reshape(1, -1)
                             else:
@@ -548,12 +548,12 @@ class saab:
                     print(pred_labels[i])
                     print(labels[i])
                     print(clus_labels[pred_labels[i]])
-                    if clus_labels[pred_labels[i]] == labels[i]:
+                    if clus_labels[pred_labels[i]] == train_labels[i]:
                         labels[i, pred_labels[i]] = 1
                     else:
                         distance_assigned = euclidean_distances(feature[i].reshape(1, -1),
                                                                 centroid[pred_labels[i]].reshape(1, -1))
-                        cluster_special = [j for j in range(num_clusters[k]) if clus_labels[j] == labels[i]]
+                        cluster_special = [j for j in range(num_clusters[k]) if clus_labels[j] == train_labels[i]]
                         distance = np.zeros(len(cluster_special))
                         for j in range(len(cluster_special)):
                             distance[j] = euclidean_distances(feature[i].reshape(1, -1),
@@ -581,7 +581,7 @@ class saab:
                 for i in range(num_clusters[k]):
                     for t in range(use_classes):
                         for j in range(feature.shape[0]):
-                            if pred_labels[j] == i and labels[j] == t:
+                            if pred_labels[j] == i and train_labels[j] == t:
                                 num_clas[i, t] += 1
                 acc_train = np.sum(np.amax(num_clas, axis=1)) / feature.shape[0]
                 if(verbose):
@@ -596,7 +596,7 @@ class saab:
 
             else:
                 # least square regression
-                labels = keras.utils.to_categorical(labels, 10)
+                labels = keras.utils.to_categorical(train_labels, 10)
                 A = np.ones((feature.shape[0], 1), dtype=np.float32)
                 feature = np.concatenate((A, feature), axis=1)
                 weight = np.matmul(LA.pinv(feature), labels).astype(np.float32)
@@ -610,7 +610,7 @@ class saab:
                     print(k, ' layer LSR output shape:', feature.shape)
 
                 pred_labels = np.argmax(feature, axis=1)
-                acc_train = sklearn.metrics.accuracy_score(labels, pred_labels)
+                acc_train = sklearn.metrics.accuracy_score(train_labels, pred_labels)
                 if(verbose):
                     print('training acc is {}'.format(acc_train))
 
