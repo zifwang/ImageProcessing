@@ -4,6 +4,7 @@ import pickle
 import sklearn
 import keras
 import os
+import multiprocessing as mp
 from skimage.util.shape import view_as_windows
 from skimage.measure import block_reduce
 from sklearn.decomposition import PCA
@@ -586,10 +587,6 @@ class saab:
 
                 # Relu
                 feature = self.relu(feature)
-                # for i in range(feature.shape[0]):
-                #     for j in range(feature.shape[1]):
-                #         if feature[i, j] < 0:
-                #             feature[i, j] = 0
 
             else:
                 # least square regression
