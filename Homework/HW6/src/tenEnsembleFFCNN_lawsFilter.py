@@ -1,3 +1,7 @@
+"""
+    Author: Zifan Wang
+    Train ten different FF-CNNs with diversity increasing by using 3*3 Laws filter bank
+"""
 import numpy as np
 from numpy import linalg as LA
 import keras

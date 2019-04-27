@@ -1,3 +1,7 @@
+"""
+    Author: Zifan Wang
+    Train ten different FF-CNNs
+"""
 import numpy as np
 import keras
 from keras import backend as K

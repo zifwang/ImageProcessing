@@ -1,3 +1,11 @@
+"""
+    Author: Zifan Wang
+    The saab class is used to calculate the saab coefficient.
+    Paper Reference: Kuo, C. C. J., Zhang, M., Li, S., Duan, J., & Chen, Y. (2019). Interpretable convolutional neural networks via feedforward design. Journal of Visual Communication and Image Representation.
+    This code is the reconstruct version of https://github.com/davidsonic/Interpretable_CNN/tree/master/MNIST_FF
+    New work: Add stride parameter and maxPooling parameter. Also, reduce some training time.
+"""
+
 import numpy as np
 import matplotlib.pyplot as plt
 import pickle

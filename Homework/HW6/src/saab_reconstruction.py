@@ -1,4 +1,7 @@
-
+"""
+    Author: Zifan Wang
+    Image reconstructions from Saab coefficients
+"""
 import numpy as np
 import cv2
 import pickle

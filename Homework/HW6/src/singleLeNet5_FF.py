@@ -1,3 +1,7 @@
+"""
+    Author: Zifan Wang
+    Individual FF-CNN on the MNIST dataset
+"""
 from __future__ import print_function
 import numpy as np
 import keras
@@ -9,8 +13,8 @@ import data
 
 if __name__ == '__main__':
     ffCNN = feedforward_model.feedforwardCNN()
-    ffCNN.loadInitParameters(useProvidedParam = False, useMNIST = True, images = None, labels = None, kernelSize = '5,5',
-                            numKernels = '5,15',energyPercent = None, numImagesUsed = 10000, classUsed = [0,1,2,3,4,5,6,7,8,9], verbose = True)
+    ffCNN.loadInitParameters(useProvidedParam = False, useMNIST = True, images = None, labels = None, kernelSize = '5,5', stride = [1,1],
+                            numKernels = '5,15', maxPooling = True, energyPercent = None, numImagesUsed = 10000, classUsed = [0,1,2,3,4,5,6,7,8,9], verbose = True)
     leNet5 = ffCNN.feedforward_leNet5()
     train_images, train_labels, test_images, test_labels, class_list = data.import_data('0-9')
     train_labels = to_categorical(train_labels, 10)

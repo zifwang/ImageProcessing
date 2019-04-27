@@ -1,3 +1,14 @@
+"""
+	Author: Zifan Wang
+	This code is used to generate and prepare data
+	Credit: https://github.com/davidsonic/Interpretable_CNN/blob/master/MNIST_FF/data.py
+	More Function: 
+		get_mnist_data()
+		data_separation()
+		applyLawsFilter()
+		compare_bp_ffCNN()
+"""
+
 import keras
 from keras.datasets import mnist
 from keras.models import load_model

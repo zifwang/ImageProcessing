@@ -1,3 +1,8 @@
+"""
+    Author: Zifan Wang
+    The feedforwardCNN class will use saab coefficients in the CNN. 
+    Reconstruct code from https://github.com/davidsonic/Interpretable_CNN/blob/master/adv_attack/mnist_ff_model.py
+"""
 import keras
 import pickle
 import numpy as np
