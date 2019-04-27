@@ -131,7 +131,7 @@ if __name__ == '__main__':
     train_images, train_labels, test_images, test_labels, class_list = data.import_data('0-9')
     mySaab = saab_training.saab()
     params = mySaab.get_kernel_compact(train_images,train_labels,'4,4',[4,4],num_kernels,False,None,10000,class_list,True)
-    img, feature = extract_feature(fileName='/home/zifwang/Documents/ImageProcessing/Homework/HW6/HW6_images/1.png',pca_params = params,n1=n1+1,n2=n2+1)
+    img, feature = extract_feature(fileName='../HW6_images/1.png',pca_params = params,n1=n1+1,n2=n2+1)
     outImageGray,normalizedOut = inv_transformation(features=feature,pca_params=params,n1=n1+1,n2=n2+1)
     psnr = PSNR(img,outImageGray)
     print('PSNR: ',psnr)
