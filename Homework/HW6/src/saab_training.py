@@ -4,6 +4,7 @@ import pickle
 import sklearn
 import keras
 import os
+import math
 import multiprocessing as mp
 from skimage.util.shape import view_as_windows
 from skimage.measure import block_reduce
@@ -209,7 +210,9 @@ class saab:
                                    images = None,
                                    labels = None,
                                    kernelSize = None,
+                                   stride = None,
                                    numKernels = None,
+                                   maxPooling = None,
                                    energyPercent = None,
                                    numImagesUsed = None,
                                    classUsed = None,
@@ -220,7 +223,9 @@ class saab:
                 images: (type np) the input image dataset with shape = [numImages,imageHeight,imageWidth,imageChannel]
                 labels: (type np) the input labels corresponding to the input image with shape = [num_images]
                 kernelSize: (type list) kernel size of each stage. the length defines how many stages conducted
+                stride: (type list) stride
                 numKernels: (type list) number of kernels for each stage. the length should be equal to kernel_size if it is set. 
+                maxPooling: (type boolean) whether to use maxPooling.
                 energyPercent: (type float) the percent of energy to be kept in all PCA stages. If numKernels is set, energyPercent will be ignored
                 numImagesUsed: (type int) the number of subset of training images
                 classUsed: (type list) the classes of training images
@@ -228,7 +233,7 @@ class saab:
             Returns:
                 parameters: (type dictionary). A dictionary contains all important parameters of PCA.
                             keys: Layer_%d/feature_expectation
-                                  Layer_%d/Kernel
+                                  Layer_%d/kernel
                                   Layer_%d/pca_mean
                                   Layer_%d/bias
                                   num_layers
@@ -255,7 +260,7 @@ class saab:
         # Training
         for i in range (numLayers):
             # Create Patches
-            samplePatches = self.window_process_2(sampleImages,kernelSize[i],1)                                 # Overlapping
+            samplePatches = self.window_process_2(sampleImages,kernelSize[i],stride[i])                                 # Overlapping
             _,h,w,_ = samplePatches.shape
             # Flatten
             samplePatches = samplePatches.reshape([-1,samplePatches.shape[-1]])
@@ -299,11 +304,12 @@ class saab:
             sampleImages = np.moveaxis(sampleImages,3,1)
 
             # Max-pooling
-            sampleImages = block_reduce(sampleImages,(1,1,2,2),np.max)
+            if(maxPooling):
+                sampleImages = block_reduce(sampleImages,(1,1,2,2),np.max)
 
             # Save parameters in layer i
             parameters['Layer_%d/feature_expectation' % i] = featureExpectation
-            parameters['Layer_%d/Kernel' % i] = kernels
+            parameters['Layer_%d/kernel' % i] = kernels
             parameters['Layer_%d/pca_mean' % i] = mean
 
             # Print method
@@ -339,7 +345,7 @@ class saab:
         for i in range(numLayers):
             # Extract parameters
             featureExpectation = parameters['Layer_%d/feature_expectation' % i].astype(np.float32)
-            kernels = parameters['Layer_%d/Kernel' % i].astype(np.float32)
+            kernels = parameters['Layer_%d/kernel' % i].astype(np.float32)
 
             # Create patches
             if(i == 0):
@@ -388,7 +394,9 @@ class saab:
                            images = None,
                            labels = None,
                            kernelSize = None,
+                           stride = None,
                            numKernels = None,
+                           maxPooling = None,
                            energyPercent = None,
                            numImagesUsed = None,
                            classUsed = None,
@@ -398,8 +406,10 @@ class saab:
             Arguments:
                 images: (type np) the input image dataset with shape = [numImages,imageHeight,imageWidth,imageChannel]
                 labels: (type np) the input labels corresponding to the input image with shape = [num_images]
-                kernelSize: (type string) kernel size of each stage. the length defines how many stages conducted
-                numKernels: (type string) number of kernels for each stage. the length should be equal to kernel_size if it is set. 
+                kernelSize: (type list) kernel size of each stage. the length defines how many stages conducted
+                stride: (type list) stride
+                numKernels: (type list) number of kernels for each stage. the length should be equal to kernel_size if it is set. 
+                maxPooling: (type boolean) whether to use maxPooling.
                 energyPercent: (type float) the percent of energy to be kept in all PCA stages. If numKernels is set, energyPercent will be ignored
                 numImagesUsed: (type int) the number of subset of training images
                 classUsed: (type list) the classes of training images
@@ -429,7 +439,7 @@ class saab:
 
         print('Getting Kernel')
         # Training
-        pcaParameters = self.multi_stage_saab_transform(images=trainingImage,labels=labels,kernelSize=kernel_sizes,numKernels=num_kernels,energyPercent=energy_percent,numImagesUsed=use_num_images,classUsed=classUsed,verbose=verbose)
+        pcaParameters = self.multi_stage_saab_transform(images=trainingImage,labels=labels,kernelSize=kernel_sizes,stride = stride,numKernels=num_kernels,maxPooling=maxPooling,energyPercent=energy_percent,numImagesUsed=use_num_images,classUsed=classUsed,verbose=verbose)
 
         # Save pcaParameters
         self.save_data(pcaParameters,'pca_params_compact.pkl')
@@ -443,7 +453,7 @@ class saab:
                 trainingImages: (type np) input images [numSamples, featureDimension] 
                 parameters: (type dictionary). A dictionary contains all important parameters of PCA.
                             keys: Layer_%d/feature_expectation
-                                  Layer_%d/Kernel
+                                  Layer_%d/kernel
                                   Layer_%d/pca_mean
                                   Layer_%d/bias
                                   num_layers
@@ -467,7 +477,9 @@ class saab:
                            images = None,
                            train_labels = None,
                            kernelSize = None,
+                           stride = None,
                            numKernels = None,
+                           maxPooling = None,
                            energyPercent = None,
                            numImagesUsed = None,
                            classUsed = None,
@@ -485,35 +497,40 @@ class saab:
             Returns:
         """
         # Get feat_compact.pkl
-        exists = os.path.exists('feat_compact.pkl')
-        if not exists:
-            # Get kernel
-            pcaParameters = self.get_kernel_compact(images=images, labels=train_labels, kernelSize=kernelSize, numKernels=numKernels, energyPercent=energyPercent, numImagesUsed=numImagesUsed, classUsed=classUsed, verbose=verbose)
-            # Get sample images
-            feat = self.get_feature_compact(trainingImages=images, parameters = pcaParameters, verbose = verbose)
-        else:
-            # load feature
-            fr = open('feat_compact.pkl', 'rb')
-            feat = pickle.load(fr)
-            fr.close()
+        # exists = os.path.exists('feat_compact.pkl')
+        # if not exists:
+        #     # Get kernel
+        #     pcaParameters = self.get_kernel_compact(images=images, labels=train_labels, kernelSize=kernelSize, numKernels=numKernels, energyPercent=energyPercent, numImagesUsed=numImagesUsed, classUsed=classUsed, verbose=verbose)
+        #     # Get sample images
+        #     feat = self.get_feature_compact(trainingImages=images, parameters = pcaParameters, verbose = verbose)
+        # else:
+        #     # load feature
+        #     fr = open('feat_compact.pkl', 'rb')
+        #     feat = pickle.load(fr)
+        #     fr.close()
+        # Get kernel
+        pcaParameters = self.get_kernel_compact(images=images, labels=train_labels, kernelSize=kernelSize, stride = stride, numKernels=numKernels, maxPooling=maxPooling, energyPercent=energyPercent, numImagesUsed=numImagesUsed, classUsed=classUsed, verbose=verbose)
+        # Get sample images
+        feat = self.get_feature_compact(trainingImages=images, parameters = pcaParameters, verbose = verbose)
         # Get feature
         feature = feat['feature']
 
         if(verbose):
+            print('Getting weights & biases in FC layer')
             print('feature type: ', feature.dtype)
-            print("S4 shape:", feature.shape)
+            print('S4 shape:', feature.shape)
 
         # Reshape and move axis
-        feature=feature.reshape(60000, 16, 5, 5)
+        h = int(math.sqrt(feature.shape[1]/16))
+        feature=feature.reshape(feature.shape[0], 16, h, h)
         feature=np.moveaxis(feature, 1, 3)
-        feature=feature.reshape(-1, 5*5*16)
+        feature=feature.reshape(feature.shape[0], h*h*16)
 
 
         num_clusters = [120, 84, 10]
         use_classes = len(classUsed)
         weights = {}
         bias = {}
-        pool = mp.Pool(mp.cpu_count())
 
         for k in range(len(num_clusters)):
             if k != len(num_clusters) - 1:
@@ -619,5 +636,6 @@ class saab:
         pickle.dump(bias, fw, protocol=2)
         fw.close()
 
+        return pcaParameters, feat, weights, bias
 
 
