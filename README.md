@@ -1,10 +1,10 @@
 This repository contains multiple image processing methods.
 
-#See README.md files in the src folder in each homework folder.
+See README.md files in the src folder in each homework folder.
 
-#Reference of methods in the Homework directory: 
+Reference of methods in the Homework directory: 
 
-#Homework:
+Homework:
 
     HW1: 
         A. Image Demosaicing and Histogram Manipulation:
