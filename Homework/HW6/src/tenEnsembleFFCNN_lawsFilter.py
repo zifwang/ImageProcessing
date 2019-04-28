@@ -7,6 +7,8 @@ from numpy import linalg as LA
 import keras
 from keras import backend as K
 from keras.datasets import mnist
+from sklearn.decomposition import PCA
+from sklearn.svm import SVC
 import sklearn
 import os
 import random
@@ -18,7 +20,7 @@ if __name__ == '__main__':
     x_train, y_train, x_test, y_test = data.get_mnist_data()
     x_train, y_train = data.data_separation(x_train,y_train)
     y_train_oneHot = keras.utils.to_categorical(y_train, 10)
-    y_test = keras.utils.to_categorical(y_test, 10)
+    y_test_oneHot = keras.utils.to_categorical(y_test, 10)
 
     x_train_reduced = x_train[0:10000]
     y_train_reduced = y_train[0:10000]
@@ -64,21 +66,30 @@ if __name__ == '__main__':
     prediction_test = prediction_test.reshape(-1,100)
     prediction_train = prediction_train.reshape(-1,100)
 
-    # Train acc
-    weight = np.matmul(LA.pinv(prediction_train), y_train_reduced_one_hot).astype(np.float32)
-    prediction_train = np.matmul(prediction_train, weight)
-    pred_labels = np.argmax(prediction_train, axis=1)
-    train_acc = sklearn.metrics.accuracy_score(y_train_reduced, pred_labels)
-    print('Training accuracy is {}'.format(train_acc))
+    pca = PCA(n_components=60)
+    pca.fit(prediction_train)
+    reduced_prediction_train = pca.transform(prediction_train)
 
-    # Ensemble acc
-    prediction = np.dot(prediction_test, weight)
+    clf = SVC(gamma='scale')
+    clf.fit(reduced_prediction_train, y_train_reduced) 
+    print(clf.score(reduced_prediction_train,y_train_reduced))
+    print(clf.score(prediction_test,y_test))
 
-    ypred = np.eye(10)[np.argmax(prediction, axis=1)]
-    ensemble_acc = np.sum(ypred*y_test)/ypred.shape[0]
-    print('ensemble: %5f' %ensemble_acc)
+    # # Train acc
+    # weight = np.matmul(LA.pinv(prediction_train), y_train_reduced_one_hot).astype(np.float32)
+    # prediction_train = np.matmul(prediction_train, weight)
+    # pred_labels = np.argmax(prediction_train, axis=1)
+    # train_acc = sklearn.metrics.accuracy_score(y_train_reduced, pred_labels)
+    # print('Training accuracy is {}'.format(train_acc))
 
-    data.compare_bp_ffCNN(ypred)
+    # # Ensemble acc
+    # prediction = np.dot(prediction_test, weight)
+
+    # ypred = np.eye(10)[np.argmax(prediction, axis=1)]
+    # ensemble_acc = np.sum(ypred*y_test)/ypred.shape[0]
+    # print('ensemble: %5f' %ensemble_acc)
+
+    # data.compare_bp_ffCNN(ypred)
 """
 1. raw
 10000/10000 [==============================] - 1s 148us/step
